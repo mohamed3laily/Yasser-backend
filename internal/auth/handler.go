@@ -42,7 +42,6 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	// Generic response with any data structure
 	response.Success(c, "Verification code sent successfully", map[string]interface{}{
 		"phoneNumber": phoneNumber,
 		"message":     "Please check your WhatsApp for the 6-digit verification code",
@@ -59,7 +58,7 @@ func (h *Handler) VerifyOtp(c *gin.Context) {
 	phoneNumber := strings.TrimSpace(req.PhoneNumber)
 	otp := strings.TrimSpace(req.Otp)
 
-	userData, err := h.service.VerifyOtp(phoneNumber, otp)
+	userData, token, err := h.service.VerifyOtp(phoneNumber, otp)
 	if err != nil {
 		appErr := customerrors.Handle(err, "Failed to verify code")
 		response.Error(c, appErr)
@@ -69,6 +68,6 @@ func (h *Handler) VerifyOtp(c *gin.Context) {
 	response.Success(c, "Login successful", map[string]interface{}{
 		"message": "Welcome! You have been successfully authenticated",
 		"user":    userData,
-		// "token": "jwt-token-here", // Add when implementing JWT
+		"token":   token,
 	})
 }

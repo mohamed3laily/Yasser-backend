@@ -8,7 +8,6 @@ import (
 )
 
 type APIResponse struct {
-	Success bool        `json:"success"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
 	Error   *ErrorInfo  `json:"error,omitempty"`
@@ -22,7 +21,6 @@ type ErrorInfo struct {
 
 func Success(c *gin.Context, message string, data interface{}) {
 	c.JSON(http.StatusOK, APIResponse{
-		Success: true,
 		Message: message,
 		Data:    data,
 	})
@@ -31,7 +29,6 @@ func Success(c *gin.Context, message string, data interface{}) {
 func Error(c *gin.Context, appErr interface{}) {
 	if err, ok := appErr.(AppErrorInterface); ok {
 		c.JSON(err.GetStatusCode(), APIResponse{
-			Success: false,
 			Message: "Request failed",
 			Error: &ErrorInfo{
 				Code:    err.GetCode(),
@@ -42,7 +39,6 @@ func Error(c *gin.Context, appErr interface{}) {
 	}
 
 	c.JSON(http.StatusInternalServerError, APIResponse{
-		Success: false,
 		Message: "Request failed",
 		Error: &ErrorInfo{
 			Code:    "INTERNAL_SERVER_ERROR",
@@ -60,7 +56,6 @@ func ValidationError(c *gin.Context, err error) {
 	}
 
 	c.JSON(http.StatusBadRequest, APIResponse{
-		Success: false,
 		Message: "Validation failed",
 		Error: &ErrorInfo{
 			Code:    "VALIDATION_ERROR",

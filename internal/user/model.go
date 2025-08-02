@@ -3,8 +3,7 @@ package user
 import (
 	"database/sql"
 	"time"
-
-	"gorm.io/gorm"
+	"yasser-backend/pkg/models"
 )
 
 type Status string
@@ -22,7 +21,7 @@ const (
 )
 
 type User struct {
-	gorm.Model
+	models.BaseModel
 	FullName                string         `json:"fullName"`
 	ProfilePicture          string         `json:"profilePicture"`
 	PhoneNumber             string         `gorm:"unique" json:"phoneNumber"`
