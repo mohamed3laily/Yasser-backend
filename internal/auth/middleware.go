@@ -16,7 +16,6 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		claims, err := jwt.ValidateJWT(tokenString)
 		if err != nil {
@@ -25,7 +24,7 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		c.Set("userId", claims.UserID)
+		c.Set("userID", claims.UserID)
 		c.Next()
 	}
 }

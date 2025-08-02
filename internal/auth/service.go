@@ -97,17 +97,6 @@ func (s *Service) VerifyOtp(phoneNumber, otp string) (*user.User, string, error)
 	return userData, token, nil
 }
 
-func (s *Service) ResendOtp(phoneNumber string) error {
-	_, err := s.userRepo.FindByPhone(phoneNumber)
-	if err == gorm.ErrRecordNotFound {
-		return fmt.Errorf("phone number not registered: %w", customerrors.ErrNotFound)
-	}
-	if err != nil {
-		return err
-	}
-
-	return s.Login(phoneNumber)
-}
 
 func (s *Service) generateOTP() (string, error) {
 	max := big.NewInt(900000)

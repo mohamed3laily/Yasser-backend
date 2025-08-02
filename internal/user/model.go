@@ -17,7 +17,7 @@ const (
 
 const (
 	EN Language = "en"
-	ES Language = "es"
+	AR Language = "ar"
 )
 
 type User struct {
@@ -44,7 +44,7 @@ func (s Status) IsValid() bool {
 
 func (l Language) IsValid() bool {
 	switch l {
-	case EN, ES:
+	case EN, AR:
 		return true
 	}
 	return false

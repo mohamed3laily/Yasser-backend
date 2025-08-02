@@ -1,15 +1,18 @@
 package user
 
 import (
+	"context"
+	"fmt"
+	"time"
 	"yasser-backend/database"
 )
 
 type Repository interface {
 	FindByPhone(phone string) (*User, error)
 	Create(phone string) (*User, error)
-	GetByID(id uint) (*User, error)
+	FindByID(id uint) (*User, error)
 	Update(user *User) (*User, error)
-	Delete(id uint) error
+	UpdateLastLogin(ctx context.Context, userID uint) error
 }
 
 type repo struct{}
@@ -39,7 +42,7 @@ func (r *repo) Create(phone string) (*User, error) {
 	return &user, nil
 }
 
-func (r *repo) GetByID(id uint) (*User, error) {
+func (r *repo) FindByID(id uint) (*User, error) {
 	var user User
 	result := database.DB.First(&user, id)
 	if result.Error != nil {
@@ -50,11 +53,19 @@ func (r *repo) GetByID(id uint) (*User, error) {
 
 func (r *repo) Update(user *User) (*User, error) {
 	if err := database.DB.Save(user).Error; err != nil {
+		fmt.Printf("Error fetching updated user: %v\n", err)
+		return nil, err
+	}
+	if err := database.DB.First(user, user.ID).Error; err != nil {
+		fmt.Printf("Error fetching updated user: %v\n", err)
 		return nil, err
 	}
 	return user, nil
 }
 
-func (r *repo) Delete(id uint) error {
-	return database.DB.Delete(&User{}, id).Error
+func (r *repo) UpdateLastLogin(ctx context.Context, userID uint) error {
+	return database.DB.WithContext(ctx).Model(&User{}).
+		Where("id = ?", userID).
+		Update("last_login", time.Now()).
+		Error
 }
