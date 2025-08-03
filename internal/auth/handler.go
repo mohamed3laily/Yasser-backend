@@ -3,10 +3,10 @@ package auth
 import (
 	"strings"
 
-	"github.com/gin-gonic/gin"
-
 	customerrors "yasser-backend/pkg/errors"
 	"yasser-backend/pkg/response"
+
+	"github.com/gin-gonic/gin"
 )
 
 type LoginRequest struct {
@@ -37,15 +37,13 @@ func (h *Handler) Login(c *gin.Context) {
 
 	err := h.service.Login(phoneNumber)
 	if err != nil {
-		appErr := customerrors.Handle(err, "Failed to send verification code")
+		appErr := customerrors.Handle(c, err, "auth.failed_to_send_verification_code")
 		response.Error(c, appErr)
 		return
 	}
 
-	// Generic response with any data structure
-	response.Success(c, "Verification code sent successfully", map[string]interface{}{
+	response.Success(c, "auth.verification_code_sent", map[string]interface{}{
 		"phoneNumber": phoneNumber,
-		"message":     "Please check your WhatsApp for the 6-digit verification code",
 	})
 }
 
@@ -59,16 +57,15 @@ func (h *Handler) VerifyOtp(c *gin.Context) {
 	phoneNumber := strings.TrimSpace(req.PhoneNumber)
 	otp := strings.TrimSpace(req.Otp)
 
-	userData, err := h.service.VerifyOtp(phoneNumber, otp)
+	userData, token, err := h.service.VerifyOtp(phoneNumber, otp)
 	if err != nil {
-		appErr := customerrors.Handle(err, "Failed to verify code")
+		appErr := customerrors.Handle(c, err, "auth.failed_to_verify_code")
 		response.Error(c, appErr)
 		return
 	}
 
-	response.Success(c, "Login successful", map[string]interface{}{
-		"message": "Welcome! You have been successfully authenticated",
-		"user":    userData,
-		// "token": "jwt-token-here", // Add when implementing JWT
+	response.Success(c, "auth.login_success", map[string]interface{}{
+		"user":  userData,
+		"token": token,
 	})
 }

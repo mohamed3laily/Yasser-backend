@@ -1,0 +1,11 @@
+{
+  "success": "نجح",
+  "request_failed": "فشل الطلب",
+  "not_found": "غير موجود",
+  "unauthorized": "غير مصرح",
+  "bad_request": "طلب خاطئ",
+  "internal_server_error": "خطأ داخلي في الخادم",
+  "created_successfully": "تم الإنشاء بنجاح",
+  "updated_successfully": "تم التحديث بنجاح",
+  "deleted_successfully": "تم الحذف بنجاح"
+}
