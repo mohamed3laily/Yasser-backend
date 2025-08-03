@@ -3,6 +3,9 @@ package errors
 import (
 	"errors"
 	"net/http"
+	"yasser-backend/pkg/i18n"
+
+	"github.com/gin-gonic/gin"
 )
 
 var (
@@ -13,13 +16,18 @@ var (
 )
 
 type AppError struct {
-	Message    string `json:"message"`
-	StatusCode int    `json:"-"`
-	Code       string `json:"code"`
+	MessageKey string `json:"-"`   
+	StatusCode int    `json:"-"`    
+	Code       string `json:"code"`    
+	Params     []interface{} `json:"-"`
+	context    *gin.Context  `json:"-"`
 }
 
 func (e *AppError) Error() string {
-	return e.Message
+	if e.context != nil {
+		return i18n.T(e.context, e.MessageKey, e.Params...)
+	}
+	return i18n.TWithLang("en", e.MessageKey, e.Params...)
 }
 
 func (e *AppError) GetStatusCode() int {
@@ -30,54 +38,65 @@ func (e *AppError) GetCode() string {
 	return e.Code
 }
 
-// Generic HTTP error constructors
-func BadRequest(message string) *AppError {
+func (e *AppError) WithContext(c *gin.Context) *AppError {
+	e.context = c
+	return e
+}
+
+func BadRequest(messageKey string, params ...interface{}) *AppError {
 	return &AppError{
-		Message:    message,
+		MessageKey: messageKey,
 		StatusCode: http.StatusBadRequest,
 		Code:       "BAD_REQUEST",
+		Params:     params,
 	}
 }
 
-func NotFound(message string) *AppError {
+func NotFound(messageKey string, params ...interface{}) *AppError {
 	return &AppError{
-		Message:    message,
+		MessageKey: messageKey,
 		StatusCode: http.StatusNotFound,
 		Code:       "NOT_FOUND",
+		Params:     params,
 	}
 }
 
-func Unauthorized(message string) *AppError {
+func Unauthorized(messageKey string, params ...interface{}) *AppError {
 	return &AppError{
-		Message:    message,
+		MessageKey: messageKey,
 		StatusCode: http.StatusUnauthorized,
 		Code:       "UNAUTHORIZED",
+		Params:     params,
 	}
 }
 
-func Internal(message string) *AppError {
+func Internal(messageKey string, params ...interface{}) *AppError {
 	return &AppError{
-		Message:    message,
+		MessageKey: messageKey,
 		StatusCode: http.StatusInternalServerError,
 		Code:       "INTERNAL_SERVER_ERROR",
+		Params:     params,
 	}
 }
 
-func Handle(err error, fallbackMessage string) *AppError {
+func Handle(c *gin.Context, err error, fallbackMessageKey string) *AppError {
 	if err == nil {
 		return nil
 	}
 
+	var appErr *AppError
 	switch {
 	case errors.Is(err, ErrNotFound):
-		return NotFound(fallbackMessage)
+		appErr = NotFound("common.not_found")
 	case errors.Is(err, ErrUnauthorized):
-		return Unauthorized(fallbackMessage)
+		appErr = Unauthorized("common.unauthorized")
 	case errors.Is(err, ErrInvalid):
-		return BadRequest(fallbackMessage)
+		appErr = BadRequest("common.bad_request")
 	case errors.Is(err, ErrExpired):
-		return Unauthorized(fallbackMessage)
+		appErr = Unauthorized("auth.token_expired")
 	default:
-		return Internal(fallbackMessage)
+		appErr = Internal(fallbackMessageKey)
 	}
+
+	return appErr.WithContext(c)
 }

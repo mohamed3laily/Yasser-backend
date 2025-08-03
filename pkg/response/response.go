@@ -2,6 +2,8 @@ package response
 
 import (
 	"net/http"
+	"strings"
+	"yasser-backend/pkg/i18n"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -19,9 +21,28 @@ type ErrorInfo struct {
 	Details string `json:"details,omitempty"`
 }
 
-func Success(c *gin.Context, message string, data interface{}) {
+type AppErrorInterface interface {
+	Error() string
+	GetStatusCode() int
+	GetCode() string
+}
+
+func Success(c *gin.Context, messageKey string, data interface{}) {
 	c.JSON(http.StatusOK, APIResponse{
-		Message: message,
+		Message: i18n.T(c, messageKey),
+		Data:    data,
+	})
+}
+
+func OK(c *gin.Context, messageKey string) {
+	c.JSON(http.StatusOK, APIResponse{
+		Message: i18n.T(c, messageKey),
+	})
+}
+
+func Created(c *gin.Context, messageKey string, data interface{}) {
+	c.JSON(http.StatusCreated, APIResponse{
+		Message: i18n.T(c, messageKey),
 		Data:    data,
 	})
 }
@@ -29,7 +50,7 @@ func Success(c *gin.Context, message string, data interface{}) {
 func Error(c *gin.Context, appErr interface{}) {
 	if err, ok := appErr.(AppErrorInterface); ok {
 		c.JSON(err.GetStatusCode(), APIResponse{
-			Message: "Request failed",
+			Message: i18n.T(c, "common.request_failed"),
 			Error: &ErrorInfo{
 				Code:    err.GetCode(),
 				Message: err.Error(),
@@ -39,10 +60,10 @@ func Error(c *gin.Context, appErr interface{}) {
 	}
 
 	c.JSON(http.StatusInternalServerError, APIResponse{
-		Message: "Request failed",
+		Message: i18n.T(c, "common.request_failed"),
 		Error: &ErrorInfo{
 			Code:    "INTERNAL_SERVER_ERROR",
-			Message: "An unexpected error occurred",
+			Message: i18n.T(c, "common.internal_server_error"),
 		},
 	})
 }
@@ -50,53 +71,45 @@ func Error(c *gin.Context, appErr interface{}) {
 func ValidationError(c *gin.Context, err error) {
 	var details string
 	if validationErrors, ok := err.(validator.ValidationErrors); ok {
-		details = formatValidationErrors(validationErrors)
+		details = formatValidationErrors(c, validationErrors)
 	} else {
 		details = err.Error()
 	}
 
 	c.JSON(http.StatusBadRequest, APIResponse{
-		Message: "Validation failed",
+		Message: i18n.T(c, "validation.failed"),
 		Error: &ErrorInfo{
 			Code:    "VALIDATION_ERROR",
-			Message: "Invalid request data",
+			Message: i18n.T(c, "validation.invalid_request_data"),
 			Details: details,
 		},
 	})
 }
 
-type AppErrorInterface interface {
-	Error() string
-	GetStatusCode() int
-	GetCode() string
-}
-
-func formatValidationErrors(errs validator.ValidationErrors) string {
+func formatValidationErrors(c *gin.Context, errs validator.ValidationErrors) string {
 	var messages []string
 	for _, err := range errs {
+		var message string
 		switch err.Tag() {
 		case "required":
-			messages = append(messages, err.Field()+" is required")
+			message = i18n.T(c, "validation.required", err.Field())
 		case "min":
-			messages = append(messages, err.Field()+" must be at least "+err.Param()+" characters")
+			message = i18n.T(c, "validation.min", err.Field(), err.Param())
 		case "max":
-			messages = append(messages, err.Field()+" must be at most "+err.Param()+" characters")
+			message = i18n.T(c, "validation.max", err.Field(), err.Param())
 		case "len":
-			messages = append(messages, err.Field()+" must be exactly "+err.Param()+" characters")
+			message = i18n.T(c, "validation.len", err.Field(), err.Param())
 		case "numeric":
-			messages = append(messages, err.Field()+" must contain only numbers")
+			message = i18n.T(c, "validation.numeric", err.Field())
+		case "email":
+			message = i18n.T(c, "validation.email", err.Field())
+		case "url":
+			message = i18n.T(c, "validation.url", err.Field())
 		default:
-			messages = append(messages, err.Field()+" is invalid")
+			message = i18n.T(c, "validation.invalid", err.Field())
 		}
+		messages = append(messages, message)
 	}
-	
-	if len(messages) == 1 {
-		return messages[0]
-	}
-	
-	result := messages[0]
-	for i := 1; i < len(messages); i++ {
-		result += ", " + messages[i]
-	}
-	return result
+
+	return strings.Join(messages, ", ")
 }

@@ -1,0 +1,12 @@
+{
+  "failed": "Validation failed",
+  "invalid_request_data": "Invalid request data",
+  "required": "%s is required",
+  "min": "%s must be at least %s characters",
+  "max": "%s must be at most %s characters",
+  "len": "%s must be exactly %s characters",
+  "numeric": "%s must contain only numbers",
+  "email": "%s must be a valid email address",
+  "url": "%s must be a valid URL",
+  "invalid": "%s is invalid"
+}

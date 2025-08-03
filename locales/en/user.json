@@ -1,0 +1,16 @@
+{
+  "updated_successfully": "User updated successfully",
+  "retrieved_successfully": "User retrieved successfully",
+  "created_successfully": "User created successfully",
+  "deleted_successfully": "User deleted successfully",
+  "is_online": "User is online",
+  "not_authenticated": "User not authenticated",
+  "not_found": "User not found",
+  "failed_to_update": "Failed to update user",
+  "failed_to_get": "Failed to get user",
+  "failed_to_create": "Failed to create user",
+  "failed_to_delete": "Failed to delete user",
+  "failed_to_update_last_login": "Failed to update last login",
+  "profile_updated": "Profile updated successfully",
+  "password_changed": "Password changed successfully"
+}

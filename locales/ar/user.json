@@ -1,0 +1,16 @@
+{
+  "updated_successfully": "تم تحديث المستخدم بنجاح",
+  "retrieved_successfully": "تم استرداد المستخدم بنجاح",
+  "created_successfully": "تم إنشاء المستخدم بنجاح",
+  "deleted_successfully": "تم حذف المستخدم بنجاح",
+  "is_online": "المستخدم متصل",
+  "not_authenticated": "المستخدم غير مصادق عليه",
+  "not_found": "المستخدم غير موجود",
+  "failed_to_update": "فشل في تحديث المستخدم",
+  "failed_to_get": "فشل في الحصول على المستخدم",
+  "failed_to_create": "فشل في إنشاء المستخدم",
+  "failed_to_delete": "فشل في حذف المستخدم",
+  "failed_to_update_last_login": "فشل في تحديث آخر تسجيل دخول",
+  "profile_updated": "تم تحديث الملف الشخصي بنجاح",
+  "password_changed": "تم تغيير كلمة المرور بنجاح"
+}

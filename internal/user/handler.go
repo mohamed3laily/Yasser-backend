@@ -1,8 +1,9 @@
 package user
 
 import (
-	"net/http"
 	"yasser-backend/pkg/common"
+	"yasser-backend/pkg/errors"
+	"yasser-backend/pkg/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,40 +19,45 @@ func NewHandler(service Service) *Handler {
 func (h *Handler) UpdateUser(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		appErr := errors.Unauthorized("user.not_authenticated").WithContext(c)
+		response.Error(c, appErr)
 		return
 	}
 
 	var req UpdateUserRequest
 	if err := common.BindJSONStrict(c, &req); err != nil {
+		response.ValidationError(c, err)
 		return
 	}
 
 	if err := req.Validate(); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.ValidationError(c, err)
 		return
 	}
 
 	updatedUser, err := h.service.UpdateUser(userID.(uint), req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update user"})
+		appErr := errors.Handle(c, err, "user.failed_to_update")
+		response.Error(c, appErr)
 		return
 	}
 
-	c.JSON(http.StatusOK, updatedUser)
+	response.Success(c, "user.updated_successfully", updatedUser)
 }
 
 func (h *Handler) Ping(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		appErr := errors.Unauthorized("user.not_authenticated").WithContext(c)
+		response.Error(c, appErr)
 		return
 	}
 
 	if err := h.service.UpdateLastLogin(c.Request.Context(), userID.(uint)); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update login"})
+		appErr := errors.Handle(c, err, "user.failed_to_update_last_login")
+		response.Error(c, appErr)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"status": "online"})
+	response.OK(c, "user.is_online")
 }
