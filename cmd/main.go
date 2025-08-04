@@ -16,7 +16,8 @@ func main() {
 	config.LoadEnv()
 	database.Init()
 	migration.Migrate()
-		if err := i18n.Init("./locales"); err != nil {
+	
+	if err := i18n.Init("./locales"); err != nil {
 		log.Fatal("Failed to initialize i18n:", err)
 	}
 

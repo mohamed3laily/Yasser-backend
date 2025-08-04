@@ -6,6 +6,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
+COPY ./locales ./locales
 
 # Disable CGO to make a statically linked binary
 ENV CGO_ENABLED=0
