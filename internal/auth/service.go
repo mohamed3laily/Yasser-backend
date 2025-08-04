@@ -3,7 +3,6 @@ package auth
 import (
 	"crypto/rand"
 	"fmt"
-	"log"
 	"math/big"
 	"time"
 
@@ -18,12 +17,14 @@ import (
 type Service struct {
 	authRepo Repository
 	userRepo user.Repository
+	waSender *WhatsAppSender
 }
 
-func NewService(authRepo Repository, userRepo user.Repository) *Service {
+func NewService(authRepo Repository, userRepo user.Repository, waSender *WhatsAppSender) *Service {
 	return &Service{
 		authRepo: authRepo,
 		userRepo: userRepo,
+		waSender: waSender,
 	}
 }
 
@@ -32,7 +33,6 @@ func (s *Service) Login(phoneNumber string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Generated OTP for %s: %s\n", phoneNumber, otp)
 
 	hashedOtp, err := bcrypt.GenerateFromPassword([]byte(otp), bcrypt.DefaultCost)
 	if err != nil {
@@ -108,7 +108,5 @@ func (s *Service) generateOTP() (string, error) {
 }
 
 func (s *Service) sendOtpViaWhatsapp(phone, otp string) error {
-	log.Printf("Sending WhatsApp OTP to %s: %s", phone, otp)
-	// TODO: Implement actual WhatsApp integration
-	return nil
+	return s.waSender.SendOTP(phone, otp)
 }

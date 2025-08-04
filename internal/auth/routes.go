@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"os"
 	"yasser-backend/internal/user"
 
 	"github.com/gin-gonic/gin"
@@ -35,7 +36,12 @@ func (r *Routes) RegisterRoutes(router *gin.RouterGroup) {
 func SetupAuthModule() *Routes {
 	authRepo := NewRepository()
 	userRepo := user.NewRepository()
-	authService := NewService(authRepo, userRepo)
+	waSender := NewWhatsAppSender(WhatsAppConfig{
+		APIURL:      "https://app.wattsi.net/api/send",
+		InstanceID:  os.Getenv("WATTSI_INSTANCE_ID"),
+		AccessToken: os.Getenv("WATTSI_ACCESS_TOKEN"),
+	})
+	authService := NewService(authRepo, userRepo, waSender)
 
 	return NewRoutes(authService)
 }
