@@ -2,6 +2,7 @@ package auth
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -56,8 +57,11 @@ func (w *WhatsAppSender) SendOTP(phone, otp string) error {
 		return fmt.Errorf("create WhatsApp request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ⚠️ NOT for production!
+	}
 
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: 10 * time.Second, Transport: tr}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("[ERROR] Failed to send request: %v", err)
