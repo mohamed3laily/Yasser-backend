@@ -1,0 +1,5 @@
+{
+  "category.retrieved_successfully": "تم استرجاع التصنيف بنجاح.",
+  "category.failed_to_get": "فشل في استرجاع التصنيف.",
+  "category.failed_to_get_all": "فشل في استرجاع جميع التصنيفات."
+}
