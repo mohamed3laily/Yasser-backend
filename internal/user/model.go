@@ -28,7 +28,7 @@ type User struct {
 	PhoneLoginOtp           sql.NullString `json:"-"`
 	PhoneLoginOtpExpires    sql.NullTime   `json:"-"`
 	GoogleID                string         `json:"-"`
-	Status                  Status         `gorm:"type:varchar(20);default:ACTIVE" json:"status"`
+	Status                  Status         `gorm:"type:varchar(20);default:ACTIVE" json:"-"`
 	LanguagePreference      Language       `gorm:"type:varchar(10);default:en" json:"languagePreference"`
 	FCMToken                string         `json:"fcmToken"`
 	LastLogin               time.Time      `json:"lastLogin"`

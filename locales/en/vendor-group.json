@@ -1,0 +1,5 @@
+{
+  "category.retrieved_successfully": "Category retrieved successfully.",
+  "category.failed_to_get": "Failed to retrieve the category.",
+  "category.failed_to_get_all": "Failed to retrieve all categories."
+}
