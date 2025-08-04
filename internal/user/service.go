@@ -41,3 +41,7 @@ func (s *Service) UpdateUser(userID uint, req UpdateUserRequest) (*User, error) 
 func (s *Service) UpdateLastLogin(ctx context.Context, userID uint) error {
 	return s.repo.UpdateLastLogin(ctx, userID)
 }
+
+func (s *Service) GetUserByID(userID uint) (*User, error) {
+	return s.repo.FindByID(userID)
+}

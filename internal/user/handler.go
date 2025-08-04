@@ -61,3 +61,21 @@ func (h *Handler) Ping(c *gin.Context) {
 
 	response.OK(c, "user.is_online")
 }
+
+func (h *Handler) GetMe(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		appErr := errors.Unauthorized("user.not_authenticated").WithContext(c)
+		response.Error(c, appErr)
+		return
+	}
+
+	user, err := h.service.GetUserByID(userID.(uint))
+	if err != nil {
+		appErr := errors.Handle(c, err, "user.failed_to_get")
+		response.Error(c, appErr)
+		return
+	}
+
+	response.Success(c, "user.retrieved_successfully", user)
+}
