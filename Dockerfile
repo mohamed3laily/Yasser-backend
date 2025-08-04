@@ -7,8 +7,10 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o server ./cmd/main.go
+# Disable CGO to make a statically linked binary
+ENV CGO_ENABLED=0
 
+RUN go build -o server ./cmd/main.go
 RUN go build -o seeder ./cmd/seeder/main.go
 
 FROM debian:bullseye-slim
