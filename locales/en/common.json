@@ -7,5 +7,7 @@
   "internal_server_error": "Internal server error",
   "created_successfully": "Created successfully",
   "updated_successfully": "Updated successfully",
-  "deleted_successfully": "Deleted successfully"
+  "deleted_successfully": "Deleted successfully",
+  "city_id_required": "City ID Header is required",
+  "invalid_id": "Invalid ID"
 }
