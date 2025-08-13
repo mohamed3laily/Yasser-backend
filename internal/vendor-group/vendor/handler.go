@@ -2,7 +2,6 @@ package vendor
 
 import (
 	"strconv"
-	"yasser-backend/internal/user"
 	"yasser-backend/pkg/context"
 	customerrors "yasser-backend/pkg/errors"
 	"yasser-backend/pkg/response"
@@ -42,15 +41,13 @@ func (h *Handler) GetVendor(c *gin.Context) {
 }
 
 func (h *Handler) GetAllVendors(c *gin.Context) {
-	u, ok := c.MustGet("user").(*user.User)
-	if !ok || u.CityID == nil {
-		appErr := customerrors.Unauthorized("unauthorized").WithContext(c)
-		response.Error(c, appErr)
+	cityID, ok := utils.GetCityIDFromHeader(c)
+	if !ok {
 		return
 	}
 
 	filter := VendorFilter{
-		CityID:     *u.CityID,
+		CityID:     uint(cityID),
 		CategoryID: utils.GetOptionalUintQuery(c, "category_id"),
 	}
 

@@ -2,6 +2,8 @@ package utils
 
 import (
 	"strconv"
+	"yasser-backend/pkg/errors"
+	"yasser-backend/pkg/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,4 +16,22 @@ func GetOptionalUintQuery(c *gin.Context, key string) *uint {
 		}
 	}
 	return nil
+}
+
+func GetCityIDFromHeader(c *gin.Context) (uint, bool) {
+	cityIDStr := c.GetHeader("X-City-ID")
+	if cityIDStr == "" {
+		appErr := errors.BadRequest("common.city_id_required").WithContext(c)
+		response.Error(c, appErr)
+		return 0, false
+	}
+
+	cityID, err := strconv.ParseUint(cityIDStr, 10, 64)
+	if err != nil {
+		appErr := errors.BadRequest("common.invalid_id").WithContext(c)
+		response.Error(c, appErr)
+		return 0, false
+	}
+
+	return uint(cityID), true
 }

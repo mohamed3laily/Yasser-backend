@@ -7,5 +7,7 @@
   "internal_server_error": "خطأ داخلي في الخادم",
   "created_successfully": "تم الإنشاء بنجاح",
   "updated_successfully": "تم التحديث بنجاح",
-  "deleted_successfully": "تم الحذف بنجاح"
+  "deleted_successfully": "تم الحذف بنجاح",
+  "city_id_required": "مطلوب معرف المدينة",
+  "invalid_id": "معرف غير صالح"
 }
