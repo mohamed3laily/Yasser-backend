@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 	"yasser-backend/internal/auth/jwt"
+	"yasser-backend/internal/user"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,7 +25,16 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		u, err := user.GetUserByID(claims.UserID)
+		if err != nil || u.Status != user.ACTIVE {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found or inactive"})
+			c.Abort()
+			return
+		}
+
 		c.Set("userID", claims.UserID)
+		c.Set("user", u)
+		
 		c.Next()
 	}
 }

@@ -2,10 +2,11 @@ package vendor
 
 import (
 	"strconv"
-
+	"yasser-backend/internal/user"
 	"yasser-backend/pkg/context"
-	"yasser-backend/pkg/errors"
+	customerrors "yasser-backend/pkg/errors"
 	"yasser-backend/pkg/response"
+	"yasser-backend/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,14 +23,14 @@ func (h *Handler) GetVendor(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
-		appErr := errors.BadRequest("common.invalid_id").WithContext(c)
+		appErr := customerrors.BadRequest("common.invalid_id").WithContext(c)
 		response.Error(c, appErr)
 		return
 	}
 
 	vendor, err := h.service.GetVendorByID(uint(id))
 	if err != nil {
-		appErr := errors.Handle(c, err, "vendor.failed_to_get")
+		appErr := customerrors.Handle(c, err, "vendor-group.vendor.failed_to_get")
 		response.Error(c, appErr)
 		return
 	}
@@ -37,24 +38,35 @@ func (h *Handler) GetVendor(c *gin.Context) {
 	lang := context.GetLanguage(c)
 	vendorResponse := vendor.ToResponse(lang)
 
-	response.Success(c, "vendor.retrieved_successfully", vendorResponse)
+	response.Success(c, "vendor-group.vendor.retrieved_successfully", vendorResponse)
 }
 
 func (h *Handler) GetAllVendors(c *gin.Context) {
-	vendors, meta, err := h.service.GetAllVendors(c)
+	u, ok := c.MustGet("user").(*user.User)
+	if !ok || u.CityID == nil {
+		appErr := customerrors.Unauthorized("unauthorized").WithContext(c)
+		response.Error(c, appErr)
+		return
+	}
+
+	filter := VendorFilter{
+		CityID:     *u.CityID,
+		CategoryID: utils.GetOptionalUintQuery(c, "category_id"),
+	}
+
+	vendors, meta, err := h.service.GetAllVendors(c, filter)
 	if err != nil {
-		appErr := errors.Handle(c, err, "vendor.failed_to_get_all")
+		appErr := customerrors.Handle(c, err, "vendor-group.vendor.failed_to_get_all")
 		response.Error(c, appErr)
 		return
 	}
 
 	lang := context.GetLanguage(c)
-	
-	var vendorsResponse []*VendorResponse
-	for _, vendor := range vendors {
-		vendorsResponse = append(vendorsResponse, vendor.ToResponse(lang))
+	vendorsResponse := make([]*VendorResponse, 0, len(vendors))
+	for _, v := range vendors {
+		vendorsResponse = append(vendorsResponse, v.ToResponse(lang))
 	}
 
 	paginatedResponse := response.NewPaginatedResponse(vendorsResponse, meta)
-	response.Success(c, "vendor.retrieved_successfully", paginatedResponse)
+	response.Success(c, "vendor-group.vendor.retrieved_successfully", paginatedResponse)
 }

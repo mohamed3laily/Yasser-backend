@@ -2,6 +2,7 @@ package vendor
 
 import (
 	"yasser-backend/database"
+	"yasser-backend/internal/auth"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,7 +28,7 @@ func SetupVendorModule() *Routes {
 }
 
 func (r *Routes) RegisterRoutes(router *gin.RouterGroup) {
-	vendorGroup := router.Group("/vendors")
+	vendorGroup := router.Group("/vendors", auth.JWTAuthMiddleware())
 	{
 		vendorGroup.GET("", r.handler.GetAllVendors)
 		vendorGroup.GET("/:id", r.handler.GetVendor)

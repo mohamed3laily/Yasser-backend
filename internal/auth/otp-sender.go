@@ -26,6 +26,8 @@ func NewWhatsAppSender(cfg WhatsAppConfig) *WhatsAppSender {
 }
 
 func (w *WhatsAppSender) SendOTP(phone, otp string) error {
+	// for dev only
+	fmt.Printf(otp)
 	if w.config.APIURL == "" || w.config.InstanceID == "" || w.config.AccessToken == "" {
 		return fmt.Errorf("WhatsApp configuration is incomplete")
 	}

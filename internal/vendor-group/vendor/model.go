@@ -4,6 +4,8 @@ import (
 	"yasser-backend/internal/city"
 	"yasser-backend/internal/vendor-group/category"
 	"yasser-backend/pkg/models"
+
+	"gorm.io/gorm"
 )
 
 type Vendor struct {
@@ -23,8 +25,8 @@ type Vendor struct {
 	CityID uint      `json:"cityId" validate:"required"`
 	City   city.City `gorm:"foreignKey:CityID"`
 
-	AreaID uint           `json:"areaId" validate:"required"`
-	Area   city.District  `gorm:"foreignKey:AreaID"`
+	DistrictID uint           `json:"districtId" validate:"required"`
+	District   city.District  `gorm:"foreignKey:DistrictID"`
 
 	AddressEn string `json:"addressEn" gorm:"size:255" validate:"required"`
 	AddressAr string `json:"addressAr" gorm:"size:255" validate:"required"`
@@ -56,8 +58,8 @@ type VendorResponse struct {
 	CityID   uint   `json:"cityId"`
 	CityName string `json:"cityName"`
 
-	AreaID   uint   `json:"areaId"`
-	AreaName string `json:"areaName"`
+	DistrictID   uint   `json:"districtId"`
+	DistrictName string `json:"districtName"`
 
 	Address string `json:"address"`
 
@@ -75,6 +77,36 @@ type VendorResponse struct {
 	IsActive bool `json:"isActive"`
 }
 
+// Scopes
+func (r *repository) filterByCity(cityID uint) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("city_id = ?", cityID)
+	}
+}
+
+func (r *repository) filterByCategory(categoryID *uint) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if categoryID != nil {
+			return db.Where("category_id = ?", *categoryID)
+		}
+		return db
+	}
+}
+
+func (r *repository) filterActive() func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("is_active = ?", true)
+	}
+}
+
+func (r *repository) preloadRelations() func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Preload("City").
+			Preload("District").
+			Preload("Category")
+	}
+}
+
 
 func (v *Vendor) ToResponse(lang string) *VendorResponse {
 	response := &VendorResponse{
@@ -84,7 +116,7 @@ func (v *Vendor) ToResponse(lang string) *VendorResponse {
 		Phone:          v.Phone,
 		Email:          v.Email,
 		CityID:         v.CityID,
-		AreaID:         v.AreaID,
+		DistrictID:     v.DistrictID,
 		Latitude:       v.Latitude,
 		Longitude:      v.Longitude,
 		OpeningTime:    v.OpeningTime,
@@ -104,14 +136,14 @@ func (vr *VendorResponse) localize(lang string, vendor *Vendor) {
 		vr.Description = vendor.DescriptionAr
 		vr.Address = vendor.AddressAr
 		vr.CityName = getLocalizedName(vendor.City.NameAr, vendor.City.NameEn)
-		vr.AreaName = getLocalizedName(vendor.Area.NameAr, vendor.Area.NameEn)
+		vr.DistrictName = getLocalizedName(vendor.District.NameAr, vendor.District.NameEn)
 		vr.CategoryName = vendor.Category.NameAr
 	default:
 		vr.Name = vendor.NameEn
 		vr.Description = vendor.DescriptionEn
 		vr.Address = vendor.AddressEn
 		vr.CityName = getLocalizedName(vendor.City.NameEn, vendor.City.NameAr)
-		vr.AreaName = getLocalizedName(vendor.Area.NameEn, vendor.Area.NameAr)
+		vr.DistrictName = getLocalizedName(vendor.District.NameEn, vendor.District.NameAr)
 		vr.CategoryName = vendor.Category.NameEn
 	}
 }
@@ -121,4 +153,9 @@ func getLocalizedName(primary, secondary string) string {
 		return primary
 	}
 	return secondary
+}
+
+type VendorFilter struct {
+	CityID     uint
+	CategoryID *uint
 }

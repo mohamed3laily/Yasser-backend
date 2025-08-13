@@ -6,6 +6,7 @@ import (
 	"yasser-backend/database"
 	"yasser-backend/internal/city"
 	"yasser-backend/internal/vendor-group/category"
+	"yasser-backend/internal/vendor-group/vendor"
 )
 
 func main() {
@@ -17,6 +18,10 @@ func main() {
 
 	if err := city.Seed(database.DB); err != nil {
 		log.Fatalf("❌ Failed to seed city & districts: %v", err)
+	}
+
+	if err := vendor.Seed(database.DB); err != nil {
+		log.Fatalf("❌ Failed to seed vendors: %v", err)
 	}
 
 	log.Println("✅ Seeding completed successfully.")

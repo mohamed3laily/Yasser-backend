@@ -3,6 +3,7 @@ package user
 import (
 	"database/sql"
 	"time"
+	"yasser-backend/internal/city"
 	"yasser-backend/pkg/models"
 )
 
@@ -32,6 +33,9 @@ type User struct {
 	LanguagePreference      Language       `gorm:"type:varchar(10);default:en" json:"languagePreference"`
 	FCMToken                string         `json:"fcmToken"`
 	LastLogin               time.Time      `json:"lastLogin"`
+
+	CityID 				    *uint 		   `json:"cityId"`
+	City                    city.City      `gorm:"foreignKey:CityID"`
 }
 
 func (s Status) IsValid() bool {

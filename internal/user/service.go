@@ -29,6 +29,7 @@ func (s *Service) UpdateUser(userID uint, req UpdateUserRequest) (*User, error) 
 	user.FullName = req.FullName
 	user.FCMToken = req.FCMToken
 	user.LanguagePreference = req.LanguagePreference
+	user.CityID = req.CityId
 
 	updatedUser, err := s.repo.Update(user)
 	if err != nil {
@@ -44,4 +45,8 @@ func (s *Service) UpdateLastLogin(ctx context.Context, userID uint) error {
 
 func (s *Service) GetUserByID(userID uint) (*User, error) {
 	return s.repo.FindByID(userID)
+}
+
+func GetUserByID(userID uint) (*User, error) {
+	return NewRepository().FindByID(userID)
 }
