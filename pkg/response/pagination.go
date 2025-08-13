@@ -12,15 +12,15 @@ type PaginationMeta struct {
 }
 
 type PaginatedResponse struct {
-	Data       interface{}     `json:"data"`
-	Pagination *PaginationMeta `json:"pagination"`
+    Items      interface{}     `json:"items"`
+    Pagination *PaginationMeta `json:"pagination"`
 }
 
-func NewPaginatedResponse(data interface{}, meta *PaginationMeta) *PaginatedResponse {
-	return &PaginatedResponse{
-		Data:       data,
-		Pagination: meta,
-	}
+func NewPaginatedResponse(items interface{}, meta *PaginationMeta) *PaginatedResponse {
+    return &PaginatedResponse{
+        Items:      items,
+        Pagination: meta,
+    }
 }
 
 func FromDatabasePagination(dbPagination *database.PaginationResult) *PaginationMeta {
