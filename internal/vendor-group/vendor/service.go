@@ -9,7 +9,7 @@ import (
 
 type Service interface {
 	GetVendorByID(id uint) (*Vendor, error)
-	GetAllVendors(c *gin.Context) ([]*Vendor, *response.PaginationMeta, error)
+	GetAllVendors(c *gin.Context, filter VendorFilter) ([]*Vendor, *response.PaginationMeta, error)
 }
 
 type service struct {
@@ -27,6 +27,9 @@ func (s *service) GetVendorByID(id uint) (*Vendor, error) {
 	return s.repo.GetByID(id)
 }
 
-func (s *service) GetAllVendors(c *gin.Context) ([]*Vendor, *response.PaginationMeta, error) {
-	return s.repo.GetAll(c)
+func (s *service) GetAllVendors(c *gin.Context, filter VendorFilter) ([]*Vendor, *response.PaginationMeta, error) {
+	if filter.CityID == 0 {
+		return nil, nil, errors.ErrInvalid
+	}
+	return s.repo.GetAll(c, filter)
 }

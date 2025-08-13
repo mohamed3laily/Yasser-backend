@@ -15,7 +15,7 @@ func ToUserResponse(u *User) UserResponse {
         LanguagePreference: string(u.LanguagePreference),
         FCMToken:           u.FCMToken,
         LastLogin:          u.LastLogin,
-        CityID:             u.CityId,
+        CityID:             u.CityID,
     }
 }
 
@@ -24,7 +24,7 @@ func ToUserWithCityResponse(u *User, city *city.City) UserWithCityResponse {
 
     var cityResp *CityResponse
 
-    if u.CityId != nil && city != nil && city.ID > 0 {
+    if u.CityID != nil && city != nil && city.ID > 0 {
         lang := string(u.LanguagePreference)
         if lang == "" {
             lang = "en"

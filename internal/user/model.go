@@ -34,8 +34,8 @@ type User struct {
 	FCMToken                string         `json:"fcmToken"`
 	LastLogin               time.Time      `json:"lastLogin"`
 
-	CityId 				    *uint 		   `json:"cityId"`
-	City                    city.City      `gorm:"foreignKey:CityId"`
+	CityID 				    *uint 		   `json:"cityId"`
+	City                    city.City      `gorm:"foreignKey:CityID"`
 }
 
 func (s Status) IsValid() bool {

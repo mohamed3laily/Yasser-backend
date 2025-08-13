@@ -12,7 +12,7 @@ import (
 
 type Repository interface {
 	GetByID(id uint) (*Vendor, error)
-	GetAll(c *gin.Context) ([]*Vendor, *response.PaginationMeta, error)
+	GetAll(c *gin.Context, filter VendorFilter) ([]*Vendor, *response.PaginationMeta, error)
 }
 
 type repository struct {
@@ -25,7 +25,7 @@ func NewRepository(db *gorm.DB) Repository {
 
 func (r *repository) GetByID(id uint) (*Vendor, error) {
 	var vendor Vendor
-	err := r.db.Preload("City").Preload("Area").Preload("Category").First(&vendor, id).Error
+	err := r.db.Preload("City").Preload("District").Preload("Category").First(&vendor, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, customerrors.ErrNotFound
@@ -35,15 +35,17 @@ func (r *repository) GetByID(id uint) (*Vendor, error) {
 	return &vendor, nil
 }
 
-func (r *repository) GetAll(c *gin.Context) ([]*Vendor, *response.PaginationMeta, error) {
+func (r *repository) GetAll(c *gin.Context, filter VendorFilter) ([]*Vendor, *response.PaginationMeta, error) {
 	var vendors []*Vendor
 
-	err := r.db.Scopes(database.Paginate(c)).
-		Preload("City").
-		Preload("Area").
-		Preload("Category").
-		Find(&vendors).Error
-	
+	err := r.db.Scopes(
+		database.Paginate(c),
+		r.filterByCity(filter.CityID),
+		r.filterByCategory(filter.CategoryID),
+		r.filterActive(),
+		r.preloadRelations(),
+	).Find(&vendors).Error
+
 	if err != nil {
 		return nil, nil, err
 	}
