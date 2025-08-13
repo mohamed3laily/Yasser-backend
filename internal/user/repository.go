@@ -44,7 +44,7 @@ func (r *repo) Create(phone string) (*User, error) {
 
 func (r *repo) FindByID(id uint) (*User, error) {
 	var user User
-	result := database.DB.First(&user, id)
+	result := database.DB.Preload("City").First(&user, id)
 	if result.Error != nil {
 		return nil, result.Error
 	}

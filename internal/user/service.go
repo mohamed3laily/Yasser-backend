@@ -29,6 +29,7 @@ func (s *Service) UpdateUser(userID uint, req UpdateUserRequest) (*User, error) 
 	user.FullName = req.FullName
 	user.FCMToken = req.FCMToken
 	user.LanguagePreference = req.LanguagePreference
+	user.CityId = req.CityId
 
 	updatedUser, err := s.repo.Update(user)
 	if err != nil {

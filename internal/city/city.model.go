@@ -12,7 +12,7 @@ type City struct {
 	NameAr      string         `gorm:"not null;uniqueIndex"`
 	Latitude  float64 // center of the city
 	Longitude float64
-	Areas     []District         `gorm:"foreignKey:CityID"`
+    Districts   []District     `gorm:"foreignKey:CityID" json:"-"`
 }
 
 func SearchCityByName(query string) func(db *gorm.DB) *gorm.DB {

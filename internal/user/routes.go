@@ -20,7 +20,7 @@ func (r *Routes) RegisterRoutes(router *gin.RouterGroup, authMiddleware gin.Hand
 	userGroup := router.Group("/users")
 	userGroup.Use(authMiddleware)
 	{
-		userGroup.PUT("/:id", r.updateUser)
+		userGroup.PUT("/me", r.updateUser)
 		userGroup.GET("/ping", r.handler.Ping)
 		userGroup.GET("/me", r.handler.GetMe)
 	}

@@ -17,32 +17,34 @@ func NewHandler(service Service) *Handler {
 }
 
 func (h *Handler) UpdateUser(c *gin.Context) {
-	userID, exists := c.Get("userID")
-	if !exists {
-		appErr := errors.Unauthorized("user.not_authenticated").WithContext(c)
-		response.Error(c, appErr)
-		return
-	}
+    userID, exists := c.Get("userID")
+    if !exists {
+        appErr := errors.Unauthorized("user.not_authenticated").WithContext(c)
+        response.Error(c, appErr)
+        return
+    }
 
-	var req UpdateUserRequest
-	if err := common.BindJSONStrict(c, &req); err != nil {
-		response.ValidationError(c, err)
-		return
-	}
+    var req UpdateUserRequest
+    if err := common.BindJSONStrict(c, &req); err != nil {
+        response.ValidationError(c, err)
+        return
+    }
 
-	if err := req.Validate(); err != nil {
-		response.ValidationError(c, err)
-		return
-	}
+    if err := req.Validate(); err != nil {
+        response.ValidationError(c, err)
+        return
+    }
 
-	updatedUser, err := h.service.UpdateUser(userID.(uint), req)
-	if err != nil {
-		appErr := errors.Handle(c, err, "user.failed_to_update")
-		response.Error(c, appErr)
-		return
-	}
+    updatedUser, err := h.service.UpdateUser(userID.(uint), req)
+    if err != nil {
+        appErr := errors.Handle(c, err, "user.failed_to_update")
+        response.Error(c, appErr)
+        return
+    }
 
-	response.Success(c, "user.updated_successfully", updatedUser)
+    userResp := ToUserResponse(updatedUser)
+
+    response.Success(c, "user.updated_successfully", userResp)
 }
 
 func (h *Handler) Ping(c *gin.Context) {
@@ -63,19 +65,21 @@ func (h *Handler) Ping(c *gin.Context) {
 }
 
 func (h *Handler) GetMe(c *gin.Context) {
-	userID, exists := c.Get("userID")
-	if !exists {
-		appErr := errors.Unauthorized("user.not_authenticated").WithContext(c)
-		response.Error(c, appErr)
-		return
-	}
+    userID, exists := c.Get("userID")
+    if !exists {
+        appErr := errors.Unauthorized("user.not_authenticated").WithContext(c)
+        response.Error(c, appErr)
+        return
+    }
 
-	user, err := h.service.GetUserByID(userID.(uint))
-	if err != nil {
-		appErr := errors.Handle(c, err, "user.failed_to_get")
-		response.Error(c, appErr)
-		return
-	}
+    user, err := h.service.GetUserByID(userID.(uint))
+    if err != nil {
+        appErr := errors.Handle(c, err, "user.failed_to_get")
+        response.Error(c, appErr)
+        return
+    }
 
-	response.Success(c, "user.retrieved_successfully", user)
+    resp := ToUserWithCityResponse(user, &user.City)
+
+    response.Success(c, "user.retrieved_successfully", resp)
 }
