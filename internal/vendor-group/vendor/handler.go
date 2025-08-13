@@ -1,11 +1,9 @@
-// vendor/handler.go
 package vendor
 
 import (
 	"strconv"
 
 	"yasser-backend/pkg/context"
-	"yasser-backend/pkg/dto"
 	"yasser-backend/pkg/errors"
 	"yasser-backend/pkg/response"
 
@@ -43,13 +41,7 @@ func (h *Handler) GetVendor(c *gin.Context) {
 }
 
 func (h *Handler) GetAllVendors(c *gin.Context) {
-	pagination, err := dto.PaginationQueryFromContext(c)
-	if err != nil {
-		response.ValidationError(c, err)
-		return
-	}
-
-	vendors, meta, err := h.service.GetAllVendors(pagination)
+	vendors, meta, err := h.service.GetAllVendors(c)
 	if err != nil {
 		appErr := errors.Handle(c, err, "vendor.failed_to_get_all")
 		response.Error(c, appErr)

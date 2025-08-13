@@ -10,34 +10,34 @@ type Vendor struct {
 	models.BaseModel
 
 	// Information
-	NameEn        string `json:"nameEn" gorm:"size:100;not null"`
-	NameAr        string `json:"nameAr" gorm:"size:100;not null"`
-	DescriptionEn string `json:"descriptionEn" gorm:"size:255"`
-	DescriptionAr string `json:"descriptionAr" gorm:"size:255"`
+	NameEn        string `json:"nameEn" gorm:"size:100;not null" validate:"required"`
+	NameAr        string `json:"nameAr" gorm:"size:100;not null" validate:"required"`
+	DescriptionEn string `json:"descriptionEn" gorm:"size:255" validate:"max=255"`
+	DescriptionAr string `json:"descriptionAr" gorm:"size:255" validate:"max=255"`
 	ProfilePicture string `json:"profilePicture" gorm:"size:255"`
 	CoverPicture   string `json:"coverPicture" gorm:"size:255"`
-	Phone          string `json:"phone" gorm:"size:20"`
-	Email          string `json:"email" gorm:"size:100"`
+	Phone          string `json:"phone" gorm:"size:20" validate:"required"`
+	Email          string `json:"email" gorm:"size:100" validate:"required,email"`
 
 	// Location
-	CityID uint       `json:"cityId"`
-	City   city.City  `gorm:"foreignKey:CityID"`
+	CityID uint      `json:"cityId" validate:"required"`
+	City   city.City `gorm:"foreignKey:CityID"`
 
-	AreaID uint            `json:"areaId"`
-	Area   city.District   `gorm:"foreignKey:AreaID"`
+	AreaID uint           `json:"areaId" validate:"required"`
+	Area   city.District  `gorm:"foreignKey:AreaID"`
 
-	AddressEn string `json:"addressEn" gorm:"size:255"`
-	AddressAr string `json:"addressAr" gorm:"size:255"`
+	AddressEn string `json:"addressEn" gorm:"size:255" validate:"required"`
+	AddressAr string `json:"addressAr" gorm:"size:255" validate:"required"`
 
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
+	Latitude  float64 `json:"latitude" validate:"required"`
+	Longitude float64 `json:"longitude" validate:"required"`
 
 	// Opening and Closing Time
-	OpeningTime string `json:"openingTime" gorm:"size:255"`
-	ClosingTime string `json:"closingTime" gorm:"size:255"`
+	OpeningTime string `json:"openingTime" gorm:"size:255" validate:"required"`
+	ClosingTime string `json:"closingTime" gorm:"size:255" validate:"required"`
 
 	// Category
-	CategoryID uint                     `json:"categoryId"`
+	CategoryID uint                     `json:"categoryId" validate:"required"`
 	Category   category.VendorCategory `gorm:"foreignKey:CategoryID"`
 
 	IsActive bool `json:"isActive" gorm:"default:true"`
@@ -75,6 +75,7 @@ type VendorResponse struct {
 	IsActive bool `json:"isActive"`
 }
 
+
 func (v *Vendor) ToResponse(lang string) *VendorResponse {
 	response := &VendorResponse{
 		ID:             v.ID,
@@ -92,37 +93,32 @@ func (v *Vendor) ToResponse(lang string) *VendorResponse {
 		IsActive:       v.IsActive,
 	}
 
-	if lang == "ar" {
-		response.Name = v.NameAr
-		response.Description = v.DescriptionAr
-		response.Address = v.AddressAr
-		if v.City.NameAr != "" {
-			response.CityName = v.City.NameAr
-		} else {
-			response.CityName = v.City.NameEn
-		}
-		if v.Area.NameAr != "" {
-			response.AreaName = v.Area.NameAr
-		} else {
-			response.AreaName = v.Area.NameEn
-		}
-		response.CategoryName = v.Category.NameAr
-	} else {
-		response.Name = v.NameEn
-		response.Description = v.DescriptionEn
-		response.Address = v.AddressEn
-		if v.City.NameEn != "" {
-			response.CityName = v.City.NameEn
-		} else {
-			response.CityName = v.City.NameAr
-		}
-		if v.Area.NameEn != "" {
-			response.AreaName = v.Area.NameEn
-		} else {
-			response.AreaName = v.Area.NameAr
-		}
-		response.CategoryName = v.Category.NameEn
-	}
-
+	response.localize(lang, v)
 	return response
+}
+
+func (vr *VendorResponse) localize(lang string, vendor *Vendor) {
+	switch lang {
+	case "ar":
+		vr.Name = vendor.NameAr
+		vr.Description = vendor.DescriptionAr
+		vr.Address = vendor.AddressAr
+		vr.CityName = getLocalizedName(vendor.City.NameAr, vendor.City.NameEn)
+		vr.AreaName = getLocalizedName(vendor.Area.NameAr, vendor.Area.NameEn)
+		vr.CategoryName = vendor.Category.NameAr
+	default:
+		vr.Name = vendor.NameEn
+		vr.Description = vendor.DescriptionEn
+		vr.Address = vendor.AddressEn
+		vr.CityName = getLocalizedName(vendor.City.NameEn, vendor.City.NameAr)
+		vr.AreaName = getLocalizedName(vendor.Area.NameEn, vendor.Area.NameAr)
+		vr.CategoryName = vendor.Category.NameEn
+	}
+}
+
+func getLocalizedName(primary, secondary string) string {
+	if primary != "" {
+		return primary
+	}
+	return secondary
 }

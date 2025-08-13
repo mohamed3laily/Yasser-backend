@@ -1,0 +1,6 @@
+{
+  "city.failed_to_get_all": "Failed to retrieve cities",
+  "city.retrieved_successfully": "Cities retrieved successfully",
+  "district.failed_to_get_all": "Failed to retrieve districts",
+  "district.retrieved_successfully": "Districts retrieved successfully"
+}

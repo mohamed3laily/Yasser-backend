@@ -109,7 +109,6 @@ func LanguageMiddleware() gin.HandlerFunc {
 
 func extractLanguage(c *gin.Context) string {
 	acceptLang := c.GetHeader("Accept-Language")
-	fmt.Println("Accept-Language:", acceptLang)
 	if acceptLang != "" {
 		langs := strings.Split(acceptLang, ",")
 		for _, lang := range langs {

@@ -1,5 +1,11 @@
 {
   "category.retrieved_successfully": "Category retrieved successfully.",
   "category.failed_to_get": "Failed to retrieve the category.",
-  "category.failed_to_get_all": "Failed to retrieve all categories."
+  "category.failed_to_get_all": "Failed to retrieve all categories.",
+  "vendor.retrieved_successfully": "Vendor retrieved successfully",
+  "vendor.created_successfully": "Vendor created successfully",
+  "vendor.failed_to_get": "Failed to get vendor",
+  "vendor.failed_to_get_all": "Failed to get vendors",
+  "vendor.failed_to_create": "Failed to create vendor",
+  "vendor.invalid_input": "Invalid vendor input"
 }

@@ -1,14 +1,15 @@
 package vendor
 
 import (
-	"yasser-backend/pkg/dto"
 	"yasser-backend/pkg/errors"
 	"yasser-backend/pkg/response"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Service interface {
 	GetVendorByID(id uint) (*Vendor, error)
-	GetAllVendors(pagination *dto.PaginationQuery) ([]*Vendor, *response.PaginationMeta, error)
+	GetAllVendors(c *gin.Context) ([]*Vendor, *response.PaginationMeta, error)
 }
 
 type service struct {
@@ -26,6 +27,6 @@ func (s *service) GetVendorByID(id uint) (*Vendor, error) {
 	return s.repo.GetByID(id)
 }
 
-func (s *service) GetAllVendors(pagination *dto.PaginationQuery) ([]*Vendor, *response.PaginationMeta, error) {
-	return s.repo.GetAll(pagination)
+func (s *service) GetAllVendors(c *gin.Context) ([]*Vendor, *response.PaginationMeta, error) {
+	return s.repo.GetAll(c)
 }

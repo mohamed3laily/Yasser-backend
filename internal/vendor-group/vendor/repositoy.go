@@ -1,18 +1,18 @@
-// vendor/repository.go
 package vendor
 
 import (
 	"errors"
-	"yasser-backend/pkg/dto"
+	"yasser-backend/pkg/database"
 	customerrors "yasser-backend/pkg/errors"
 	"yasser-backend/pkg/response"
 
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type Repository interface {
 	GetByID(id uint) (*Vendor, error)
-	GetAll(pagination *dto.PaginationQuery) ([]*Vendor, *response.PaginationMeta, error)
+	GetAll(c *gin.Context) ([]*Vendor, *response.PaginationMeta, error)
 }
 
 type repository struct {
@@ -35,26 +35,24 @@ func (r *repository) GetByID(id uint) (*Vendor, error) {
 	return &vendor, nil
 }
 
-func (r *repository) GetAll(pagination *dto.PaginationQuery) ([]*Vendor, *response.PaginationMeta, error) {
+func (r *repository) GetAll(c *gin.Context) ([]*Vendor, *response.PaginationMeta, error) {
 	var vendors []*Vendor
-	var total int64
 
-	if err := r.db.Model(&Vendor{}).Count(&total).Error; err != nil {
-		return nil, nil, err
-	}
-
-	err := r.db.Preload("City").Preload("Area").Preload("Category").
-		Offset(pagination.GetOffset()).Limit(pagination.GetLimit()).Find(&vendors).Error
+	err := r.db.Scopes(database.Paginate(c)).
+		Preload("City").
+		Preload("Area").
+		Preload("Category").
+		Find(&vendors).Error
+	
 	if err != nil {
 		return nil, nil, err
 	}
 
-	meta := &response.PaginationMeta{
-		CurrentPage: pagination.Page,
-		PerPage:     pagination.PerPage,
-		Total:       int(total),
-		LastPage:    pagination.CalculateLastPage(int(total)),
+	paginationInfo, err := database.GetPaginationInfo(c, r.db, &Vendor{})
+	if err != nil {
+		return nil, nil, err
 	}
 
+	meta := response.FromDatabasePagination(paginationInfo)
 	return vendors, meta, nil
 }
