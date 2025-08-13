@@ -26,10 +26,6 @@ func NewWhatsAppSender(cfg WhatsAppConfig) *WhatsAppSender {
 }
 
 func (w *WhatsAppSender) SendOTP(phone, otp string) error {
-	log.Printf("[DEBUG] Preparing to send WhatsApp OTP to %s with OTP: %s", phone, otp)
-	log.Printf("[DEBUG] WhatsApp API URL: %s", w.config.APIURL)
-	log.Printf("[DEBUG] WhatsApp Instance ID: %s", w.config.InstanceID)
-	log.Printf("[DEBUG] WhatsApp Access Token: %s", w.config.AccessToken)
 	if w.config.APIURL == "" || w.config.InstanceID == "" || w.config.AccessToken == "" {
 		return fmt.Errorf("WhatsApp configuration is incomplete")
 	}
@@ -48,9 +44,6 @@ func (w *WhatsAppSender) SendOTP(phone, otp string) error {
 		return fmt.Errorf("marshal WhatsApp payload: %w", err)
 	}
 
-	log.Printf("[DEBUG] Sending request to: %s", w.config.APIURL)
-	log.Printf("[DEBUG] Request body: %s", string(body))
-
 	req, err := http.NewRequest("POST", w.config.APIURL, bytes.NewReader(body))
 	if err != nil {
 		log.Printf("[ERROR] Failed to create HTTP request: %v", err)
@@ -58,7 +51,7 @@ func (w *WhatsAppSender) SendOTP(phone, otp string) error {
 	}
 	req.Header.Set("Content-Type", "application/json")
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ⚠️ NOT for production!
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 
 	client := &http.Client{Timeout: 10 * time.Second, Transport: tr}
@@ -71,13 +64,9 @@ func (w *WhatsAppSender) SendOTP(phone, otp string) error {
 
 	respBody, _ := io.ReadAll(resp.Body)
 
-	log.Printf("[DEBUG] WhatsApp API Response Status: %s", resp.Status)
-	log.Printf("[DEBUG] WhatsApp API Response Body: %s", string(respBody))
-
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("WhatsApp request failed: status %d, body: %s", resp.StatusCode, string(respBody))
 	}
 
-	log.Printf("[SUCCESS] WhatsApp OTP sent successfully to %s", phone)
 	return nil
 }

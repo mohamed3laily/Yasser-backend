@@ -1,5 +1,11 @@
 {
   "category.retrieved_successfully": "تم استرجاع التصنيف بنجاح.",
   "category.failed_to_get": "فشل في استرجاع التصنيف.",
-  "category.failed_to_get_all": "فشل في استرجاع جميع التصنيفات."
+  "category.failed_to_get_all": "فشل في استرجاع جميع التصنيفات.",
+  "vendor.retrieved_successfully": "تم استرجاع البائع بنجاح",
+  "vendor.created_successfully": "تم إنشاء البائع بنجاح",
+  "vendor.failed_to_get": "فشل في استرجاع البائع",
+  "vendor.failed_to_get_all": "فشل في استرجاع البائعين",
+  "vendor.failed_to_create": "فشل في إنشاء البائع",
+  "vendor.invalid_input": "بيانات البائع غير صحيحة"
 }

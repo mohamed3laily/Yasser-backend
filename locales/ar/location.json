@@ -1,0 +1,6 @@
+{
+  "city.failed_to_get_all": "فشل في استرجاع المدن",
+  "city.retrieved_successfully": "تم استرجاع المدن بنجاح",
+  "district.failed_to_get_all": "فشل في استرجاع المناطق",
+  "district.retrieved_successfully": "تم استرجاع المناطق بنجاح"
+}

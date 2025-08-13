@@ -2,6 +2,7 @@ package category
 
 import (
 	"strconv"
+	"yasser-backend/pkg/context"
 	"yasser-backend/pkg/errors"
 	"yasser-backend/pkg/response"
 
@@ -32,7 +33,7 @@ func (h *Handler) GetCategory(c *gin.Context) {
 		return
 	}
 
-	lang := getLanguageFromContext(c)
+	lang := context.GetLanguage(c)
 	categoryResponse := category.ToResponse(lang)
 
 	response.Success(c, "vendor-group.category.retrieved_successfully", categoryResponse)
@@ -46,7 +47,7 @@ func (h *Handler) GetAllCategories(c *gin.Context) {
 		return
 	}
 
-	lang := getLanguageFromContext(c)
+	lang := context.GetLanguage(c)
 	
 	var categoriesResponse []*VendorCategoryResponse
 	for _, category := range categories {
@@ -54,11 +55,4 @@ func (h *Handler) GetAllCategories(c *gin.Context) {
 	}
 
 	response.Success(c, "vendor-group.category.retrieved_successfully", categoriesResponse)
-}
-
-func getLanguageFromContext(c *gin.Context) string {
-	if lang, exists := c.Get("lang"); exists {
-		return lang.(string)
-	}
-	return "en"
 }
