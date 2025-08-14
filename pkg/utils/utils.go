@@ -18,10 +18,10 @@ func GetOptionalUintQuery(c *gin.Context, key string) *uint {
 	return nil
 }
 
-func GetCityIDFromHeader(c *gin.Context) (uint, bool) {
-	cityIDStr := c.GetHeader("X-City-ID")
+func GetDistrictIDFromHeader(c *gin.Context) (uint, bool) {
+	cityIDStr := c.GetHeader("X-District-ID")
 	if cityIDStr == "" {
-		appErr := errors.BadRequest("common.city_id_required").WithContext(c)
+		appErr := errors.BadRequest("common.district_id_required").WithContext(c)
 		response.Error(c, appErr)
 		return 0, false
 	}

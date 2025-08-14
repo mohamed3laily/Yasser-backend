@@ -15,36 +15,38 @@ func ToUserResponse(u *User) UserResponse {
         LanguagePreference: string(u.LanguagePreference),
         FCMToken:           u.FCMToken,
         LastLogin:          u.LastLogin,
-        CityID:             u.CityID,
+        DistrictID:         u.DistrictID,
     }
 }
 
-func ToUserWithCityResponse(u *User, city *city.City) UserWithCityResponse {
+func ToUserWithDistrictResponse(u *User, district *city.District) UserWithDistrictResponse {
     userResp := ToUserResponse(u)
 
-    var cityResp *CityResponse
+    var districtResp *DistrictResponse
 
-    if u.CityID != nil && city != nil && city.ID > 0 {
+    if u.DistrictID != nil && district != nil && district.ID > 0 {
         lang := string(u.LanguagePreference)
         if lang == "" {
             lang = "en"
         }
 
-        name := locale.ChooseLang(city.NameEn, city.NameAr, lang)
+        name := locale.ChooseLang(district.NameEn, district.NameAr, lang)
 
-        resp := CityResponse{
-            ID:        city.ID,
-            CreatedAt: city.CreatedAt,
+        resp := DistrictResponse{
+            ID:        district.ID,
+            CreatedAt: district.CreatedAt,
             Name:      name,
-            Latitude:  city.Latitude,
-            Longitude: city.Longitude,
+            MinLat:  district.MinLat,
+            MinLng: district.MinLng,
+            MaXLat:  district.MaxLat,
+            MaxLng: district.MaxLng,
         }
-        cityResp = &resp
+        districtResp = &resp
     }
 
 
-    return UserWithCityResponse{
+    return UserWithDistrictResponse{
         UserResponse: userResp,
-        City:         cityResp,
+        District:     districtResp,
     }
 }

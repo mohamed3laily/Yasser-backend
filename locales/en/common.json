@@ -8,6 +8,6 @@
   "created_successfully": "Created successfully",
   "updated_successfully": "Updated successfully",
   "deleted_successfully": "Deleted successfully",
-  "city_id_required": "City ID Header is required",
+  "district_id_required": "District ID Header is required",
   "invalid_id": "Invalid ID"
 }
