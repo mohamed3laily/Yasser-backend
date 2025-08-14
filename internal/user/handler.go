@@ -79,7 +79,7 @@ func (h *Handler) GetMe(c *gin.Context) {
         return
     }
 
-    resp := ToUserWithCityResponse(user, &user.City)
+    resp := ToUserWithDistrictResponse(user, &user.District)
 
     response.Success(c, "user.retrieved_successfully", resp)
 }

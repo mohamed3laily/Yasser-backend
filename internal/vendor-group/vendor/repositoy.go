@@ -40,7 +40,7 @@ func (r *repository) GetAll(c *gin.Context, filter VendorFilter) ([]*Vendor, *re
 
 	err := r.db.Scopes(
 		database.Paginate(c),
-		r.filterByCity(filter.CityID),
+		r.filterByDistrict(filter.DistrictID),
 		r.filterByCategory(filter.CategoryID),
 		r.filterActive(),
 		r.preloadRelations(),

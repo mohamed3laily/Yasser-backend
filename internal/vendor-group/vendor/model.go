@@ -78,9 +78,9 @@ type VendorResponse struct {
 }
 
 // Scopes
-func (r *repository) filterByCity(cityID uint) func(db *gorm.DB) *gorm.DB {
+func (r *repository) filterByDistrict(cityID uint) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		return db.Where("city_id = ?", cityID)
+		return db.Where("district_id = ?", cityID)
 	}
 }
 
@@ -156,6 +156,6 @@ func getLocalizedName(primary, secondary string) string {
 }
 
 type VendorFilter struct {
-	CityID     uint
+	DistrictID     uint
 	CategoryID *uint
 }

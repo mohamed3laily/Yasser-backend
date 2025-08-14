@@ -9,7 +9,7 @@ type UpdateUserRequest struct {
 	FullName           string   `json:"fullName"`
 	FCMToken           string   `json:"fcmToken"`
 	LanguagePreference Language `json:"languagePreference"`
-	CityId             *uint    `json:"cityId"`
+	DistrictID         *uint    `json:"districtId"`
 }
 
 func (r UpdateUserRequest) Validate() error {
@@ -32,17 +32,19 @@ type UserResponse struct {
     LanguagePreference string    `json:"languagePreference"`
     FCMToken           string    `json:"fcmToken"`
     LastLogin          time.Time `json:"lastLogin"`
-    CityID             *uint     `json:"cityId"`
+    DistrictID         *uint     `json:"districtId"`
 }
 
-type UserWithCityResponse struct {
+type UserWithDistrictResponse struct {
     UserResponse
-    City *CityResponse `json:"city,omitempty"`
+    District *DistrictResponse `json:"district,omitempty"`
 }
-type CityResponse struct {
+type DistrictResponse struct {
     ID        uint      `json:"id"`
     CreatedAt time.Time `json:"createdAt"`
     Name      string    `json:"name"`
-    Latitude  float64   `json:"latitude"`
-    Longitude float64   `json:"longitude"`
+    MinLat    float64   `json:"minLat"`
+    MinLng    float64   `json:"minLng"`
+    MaXLat    float64   `json:"maxLat"`
+    MaxLng    float64   `json:"maxLng"`
 }

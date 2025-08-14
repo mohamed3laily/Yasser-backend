@@ -28,7 +28,7 @@ func (s *service) GetVendorByID(id uint) (*Vendor, error) {
 }
 
 func (s *service) GetAllVendors(c *gin.Context, filter VendorFilter) ([]*Vendor, *response.PaginationMeta, error) {
-	if filter.CityID == 0 {
+	if filter.DistrictID == 0 {
 		return nil, nil, errors.ErrInvalid
 	}
 	return s.repo.GetAll(c, filter)

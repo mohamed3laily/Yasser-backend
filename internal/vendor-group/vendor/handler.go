@@ -41,13 +41,13 @@ func (h *Handler) GetVendor(c *gin.Context) {
 }
 
 func (h *Handler) GetAllVendors(c *gin.Context) {
-	cityID, ok := utils.GetCityIDFromHeader(c)
+	DistrictID, ok := utils.GetDistrictIDFromHeader(c)
 	if !ok {
 		return
 	}
 
 	filter := VendorFilter{
-		CityID:     uint(cityID),
+		DistrictID:     uint(DistrictID),
 		CategoryID: utils.GetOptionalUintQuery(c, "category_id"),
 	}
 

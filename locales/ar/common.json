@@ -8,6 +8,6 @@
   "created_successfully": "تم الإنشاء بنجاح",
   "updated_successfully": "تم التحديث بنجاح",
   "deleted_successfully": "تم الحذف بنجاح",
-  "city_id_required": "مطلوب معرف المدينة",
+  "district_id_required": "مطلوب معرف الحي",
   "invalid_id": "معرف غير صالح"
 }
