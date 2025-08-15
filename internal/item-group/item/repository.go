@@ -36,7 +36,7 @@ func (r *repository) GetByVendorID(vendorID uint) ([]ItemWithCategory, error) {
 	var items []ItemWithCategory
 	err := r.db.
 		Table("items").
-		Select(`items.id, items.name_en, items.name_ar, items.base_price, items.discount, items.vendor_id,
+		Select(`items.id, items.name_en, items.name_ar, items.base_price, items.discount_percent, items.vendor_id,
 		        items.picture, items.category_id, items.description_ar, items.description_en, c.name_en as category_name_en, c.name_ar as category_name_ar`).
 		Joins("JOIN items_categories c ON c.id = items.category_id").
 		Where("items.vendor_id = ? AND items.is_active = TRUE", vendorID).
