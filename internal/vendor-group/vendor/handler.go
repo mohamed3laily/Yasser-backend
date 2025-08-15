@@ -27,19 +27,16 @@ func (h *Handler) GetVendor(c *gin.Context) {
 		return
 	}
 
-	vendor, err := h.service.GetVendorByID(uint(id))
+	lang := context.GetLanguage(c)
+	vendor, err := h.service.GetVendorByID(uint(id), lang)
 	if err != nil {
 		appErr := customerrors.Handle(c, err, "vendor-group.vendor.failed_to_get")
 		response.Error(c, appErr)
 		return
 	}
 
-	lang := context.GetLanguage(c)
-	vendorResponse := vendor.ToResponse(lang)
-
-	response.Success(c, "vendor-group.vendor.retrieved_successfully", vendorResponse)
+	response.Success(c, "vendor-group.vendor.retrieved_successfully", vendor)
 }
-
 func (h *Handler) GetAllVendors(c *gin.Context) {
 	DistrictID, ok := utils.GetDistrictIDFromHeader(c)
 	if !ok {

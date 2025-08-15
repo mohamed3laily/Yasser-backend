@@ -70,29 +70,27 @@ func Seed(db *gorm.DB) error {
 
 	// 👇 EXACT same images you provided originally
 	profilePics := []string{
-		"https://upload.wikimedia.org/wikipedia/ar/a/a1/Albaik_logo.svg",
-		"https://upload.wikimedia.org/wikipedia/ar/a/a1/Albaik_logo.svg",
-		"https://upload.wikimedia.org/wikipedia/ar/a/a1/Albaik_logo.svg",
-		"https://buffaloburger.com/_next/image?url=https%3A%2F%2Fbuffalonlineorderingprod.s3-accelerate.amazonaws.com%2Fmenu_items%2Fd845c9309b0d95d8c5d945b6b2552491.png&w=384&q=75",
-		"https://buffaloburger.com/_next/image?url=https%3A%2F%2Fbuffalonlineorderingprod.s3-accelerate.amazonaws.com%2Fmenu_items%2Fd845c9309b0d95d8c5d945b6b2552491.png&w=384&q=75",
-		"https://buffaloburger.com/_next/image?url=https%3A%2F%2Fbuffalonlineorderingprod.s3-accelerate.amazonaws.com%2Fmenu_items%2Fd845c9309b0d95d8c5d945b6b2552491.png&w=384&q=75",
-		"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0SXU1l2VmdHLRxHeMSWN-n8cdeKRucd5Tog&s",
-		"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0SXU1l2VmdHLRxHeMSWN-n8cdeKRucd5Tog&s",
-		"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0SXU1l2VmdHLRxHeMSWN-n8cdeKRucd5Tog&s",
-		"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0SXU1l2VmdHLRxHeMSWN-n8cdeKRucd5Tog&s",
+		"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyYyH4UZCH7NcomOdvL2Lk8ZLVddiGknorPQ&s",
+		"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyYyH4UZCH7NcomOdvL2Lk8ZLVddiGknorPQ&s",
+		"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyYyH4UZCH7NcomOdvL2Lk8ZLVddiGknorPQ&s",
+		"https://static.vecteezy.com/system/resources/previews/008/058/752/non_2x/supermarket-logo-design-vector.jpg",
+		"https://static.vecteezy.com/system/resources/previews/008/058/752/non_2x/supermarket-logo-design-vector.jpg",
+		"https://static.vecteezy.com/system/resources/previews/008/058/752/non_2x/supermarket-logo-design-vector.jpg",
+		"https://thumbs.dreamstime.com/b/grocery-shop-emblem-food-store-supermarket-market-vector-icon-sign-silhouette-shopping-bag-products-baguette-361840126.jpg",
+		"https://thumbs.dreamstime.com/b/grocery-shop-emblem-food-store-supermarket-market-vector-icon-sign-silhouette-shopping-bag-products-baguette-361840126.jpg",
+		"https://thumbs.dreamstime.com/b/grocery-shop-emblem-food-store-supermarket-market-vector-icon-sign-silhouette-shopping-bag-products-baguette-361840126.jpg",
+		"https://thumbs.dreamstime.com/b/grocery-shop-emblem-food-store-supermarket-market-vector-icon-sign-silhouette-shopping-bag-products-baguette-361840126.jpg",
 	}
 	coverPics := []string{
-		"https://watanimg.elwatannews.com/image_archive/648x316/20451042101567622797.jpg",
-		"https://watanimg.elwatannews.com/image_archive/648x316/20451042101567622797.jpg",
-		"https://watanimg.elwatannews.com/image_archive/648x316/20451042101567622797.jpg",
+		"https://media.licdn.com/dms/image/v2/D4E12AQGuQGl0Hhpq_w/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1696413376377?e=2147483647&v=beta&t=QKd-dJKtHK2tu4hcB_wU7qM4C4mceHBfUPeyGuXv48M",
+		"https://i0.wp.com/www.laundryheap.com/blog/wp-content/uploads/2023/03/table-g9cfa78ffd_1920.jpg?resize=768%2C512&ssl=1",
+		"https://images.ctfassets.net/3vektz2wjwwa/7cI24jNdK9dgAw06UnQWB7/46c4c1c3cb99b80d3ce15e72369b35f3/10-things-to-consider-before-setting-up-a-restaurant-1600x727.jpg?fm=webp",
+		"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/11/4f/8d/4e/renoufs-sharing-platters.jpg?w=900&h=500&s=1",		"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/11/4f/8d/4e/renoufs-sharing-platters.jpg?w=900&h=500&s=1",
 		"https://buffalonlineorderingprod.s3.eu-west-1.amazonaws.com/carousels/d4540a13ef8f58f47f31e30c9faaa7dc.png",
-		"https://buffalonlineorderingprod.s3.eu-west-1.amazonaws.com/carousels/d4540a13ef8f58f47f31e30c9faaa7dc.png",
-		"https://buffalonlineorderingprod.s3.eu-west-1.amazonaws.com/carousels/d4540a13ef8f58f47f31e30c9faaa7dc.png",
 		"https://www.amnesty.org/ar/wp-content/uploads/2024/10/302466-1-scaled.jpg",
-		"https://www.amnesty.org/ar/wp-content/uploads/2024/10/302466-1-scaled.jpg",
-		"https://www.amnesty.org/ar/wp-content/uploads/2024/10/302466-1-scaled.jpg",
-		"https://www.amnesty.org/ar/wp-content/uploads/2024/10/302466-1-scaled.jpg",
-	}
+		"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/e4/e9/64/the-stunning-outside.jpg?w=900&h=500&s=1",
+		"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/e4/e9/64/the-stunning-outside.jpg?w=900&h=500&s=1",
+		"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/11/4f/8d/4e/renoufs-sharing-platters.jpg?w=900&h=500&s=1",	}
 
 	openingTimes := []string{"08:00", "09:00", "10:00", "07:00", "06:00"}
 	closingTimes := []string{"22:00", "23:00", "00:00", "21:00", "24:00"}
@@ -160,7 +158,6 @@ func Seed(db *gorm.DB) error {
 				CategoryID: category.ID,
 				IsActive:   true,
 			}
-
 			var existing Vendor
 			err := db.Where("name_en = ? AND phone = ?", vendor.NameEn, vendor.Phone).First(&existing).Error
 			if err == gorm.ErrRecordNotFound {

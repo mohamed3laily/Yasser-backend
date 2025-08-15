@@ -1,6 +1,7 @@
 package vendor
 
 import (
+	"yasser-backend/internal/item-group/item"
 	"yasser-backend/pkg/errors"
 	"yasser-backend/pkg/response"
 
@@ -8,23 +9,37 @@ import (
 )
 
 type Service interface {
-	GetVendorByID(id uint) (*Vendor, error)
+	GetVendorByID(id uint , lang string) (*VendorResponse, error )
 	GetAllVendors(c *gin.Context, filter VendorFilter) ([]*Vendor, *response.PaginationMeta, error)
 }
 
 type service struct {
-	repo Repository
+	repo        Repository
+	itemService item.Service
 }
 
-func NewService(repo Repository) Service {
-	return &service{repo: repo}
+func NewService(repo Repository, itemService item.Service) Service {
+	return &service{repo: repo, itemService: itemService}
 }
 
-func (s *service) GetVendorByID(id uint) (*Vendor, error) {
+func (s *service) GetVendorByID(id uint, lang string) (*VendorResponse, error) {
 	if id == 0 {
 		return nil, errors.ErrInvalid
 	}
-	return s.repo.GetByID(id)
+
+	vendor, err := s.repo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := vendor.ToResponse(lang)
+
+	itemsTree, err := s.itemService.GetVendorItemsGrouped(id, lang)
+	if err == nil {
+		resp.ItemsTree = itemsTree
+	}
+
+	return resp, nil
 }
 
 func (s *service) GetAllVendors(c *gin.Context, filter VendorFilter) ([]*Vendor, *response.PaginationMeta, error) {
