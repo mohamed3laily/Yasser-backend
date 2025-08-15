@@ -5,18 +5,18 @@ import (
 )
 
 func Seed(db *gorm.DB) error {
+	// Dakahlia
 	dakahlia := City{
 		NameEn:   "Dakahlia",
 		NameAr:   "الدقهلية",
-		Latitude:  31.0379,
+		Latitude: 31.0379,
 		Longitude: 31.3807,
 	}
-
 	if err := db.FirstOrCreate(&dakahlia, City{NameEn: "Dakahlia"}).Error; err != nil {
 		return err
 	}
 
-	districts := []District{
+	dakahliaDistricts := []District{
 		{
 			NameEn: "Belqas",
 			NameAr: "بلقاس",
@@ -37,8 +37,46 @@ func Seed(db *gorm.DB) error {
 		},
 	}
 
-	for _, d := range districts {
+	for _, d := range dakahliaDistricts {
 		if err := db.FirstOrCreate(&d, District{NameEn: d.NameEn, CityID: dakahlia.ID}).Error; err != nil {
+			return err
+		}
+	}
+
+	// Damietta
+	damietta := City{
+		NameEn:   "Damietta",
+		NameAr:   "دمياط",
+		Latitude: 31.4165,
+		Longitude: 31.8133,
+	}
+	if err := db.FirstOrCreate(&damietta, City{NameEn: "Damietta"}).Error; err != nil {
+		return err
+	}
+
+	damiettaDistricts := []District{
+		{
+			NameEn: "Ras El Bar",
+			NameAr: "رأس البر",
+			CityID: damietta.ID,
+			MinLat: 31.5100,
+			MaxLat: 31.5300,
+			MinLng: 31.7900,
+			MaxLng: 31.8200,
+		},
+		{
+			NameEn: "Ezbet El Borj",
+			NameAr: "عزبة البرج",
+			CityID: damietta.ID,
+			MinLat: 31.5200,
+			MaxLat: 31.5500,
+			MinLng: 31.8100,
+			MaxLng: 31.8400,
+		},
+	}
+
+	for _, d := range damiettaDistricts {
+		if err := db.FirstOrCreate(&d, District{NameEn: d.NameEn, CityID: damietta.ID}).Error; err != nil {
 			return err
 		}
 	}

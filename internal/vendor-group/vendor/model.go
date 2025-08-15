@@ -2,6 +2,7 @@ package vendor
 
 import (
 	"yasser-backend/internal/city"
+	"yasser-backend/internal/item-group/item"
 	"yasser-backend/internal/vendor-group/category"
 	"yasser-backend/pkg/models"
 
@@ -75,6 +76,9 @@ type VendorResponse struct {
 	CategoryName string `json:"categoryName"`
 
 	IsActive bool `json:"isActive"`
+
+	ItemsTree []item.CategoryWithItemsResponse `json:"itemsTree,omitempty"`
+
 }
 
 // Scopes
@@ -127,7 +131,7 @@ func (v *Vendor) ToResponse(lang string) *VendorResponse {
 
 	response.localize(lang, v)
 	return response
-}
+}	
 
 func (vr *VendorResponse) localize(lang string, vendor *Vendor) {
 	switch lang {

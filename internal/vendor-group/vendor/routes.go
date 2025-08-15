@@ -2,6 +2,7 @@ package vendor
 
 import (
 	"yasser-backend/database"
+	"yasser-backend/internal/item-group/item"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,7 +19,7 @@ func NewRoutes(service Service) *Routes {
 
 func SetupVendorModule() *Routes {
 	repo := NewRepository(database.DB)
-	service := NewService(repo)
+	service := NewService(repo, item.NewService(item.NewRepository(database.DB)))
 	handler := NewHandler(service)
 
 	return &Routes{

@@ -3,6 +3,7 @@ package routes
 import (
 	"yasser-backend/internal/auth"
 	"yasser-backend/internal/city"
+	"yasser-backend/internal/item-group/item"
 	"yasser-backend/internal/user"
 	"yasser-backend/internal/vendor-group/category"
 	"yasser-backend/internal/vendor-group/vendor"
@@ -16,6 +17,7 @@ type Registry struct {
 	categoryRoutes *category.Routes
 	vendorRoutes *vendor.Routes
 	cityRoutes *city.Routes
+	itemRoutes *item.Routes
 }
 
 func NewRegistry() *Registry {
@@ -25,6 +27,7 @@ func NewRegistry() *Registry {
 		categoryRoutes: category.SetupCategoryModule(),
 		vendorRoutes: vendor.SetupVendorModule(),
 		cityRoutes: city.SetupCityModule(),
+		itemRoutes: item.SetupItemModule(),
 	}
 }
 
@@ -36,6 +39,7 @@ func (r *Registry) RegisterAllRoutes(router *gin.Engine) {
 	r.categoryRoutes.RegisterRoutes(v1)
 	r.vendorRoutes.RegisterRoutes(v1)
 	r.cityRoutes.RegisterRoutes(v1)
+	r.itemRoutes.RegisterRoutes(v1)
 
 
 	router.GET("/health", func(c *gin.Context) {
