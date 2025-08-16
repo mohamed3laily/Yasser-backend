@@ -33,27 +33,27 @@ func Paginate(c *gin.Context) func(db *gorm.DB) *gorm.DB {
 }
 
 func GetPaginationInfo(c *gin.Context, db *gorm.DB, model interface{}) (*PaginationResult, error) {
-	page := getPageFromContext(c)
-	perPage := getPerPageFromContext(c)
+    page := getPageFromContext(c)
+    perPage := getPerPageFromContext(c)
 
-	var total int64
-	if err := db.Model(model).Count(&total).Error; err != nil {
-		return nil, err
-	}
+    var total int64
+    if err := db.Model(model).Count(&total).Error; err != nil {
+        return nil, err
+    }
 
-	lastPage := int(math.Ceil(float64(total) / float64(perPage)))
-	if lastPage == 0 {
-		lastPage = 1
-	}
+    lastPage := int(math.Ceil(float64(total) / float64(perPage)))
+    if lastPage == 0 {
+        lastPage = 1
+    }
 
-	return &PaginationResult{
-		CurrentPage: page,
-		PerPage:     perPage,
-		Total:       total,
-		LastPage:    lastPage,
-		HasNext:     page < lastPage,
-		HasPrev:     page > 1,
-	}, nil
+    return &PaginationResult{
+        CurrentPage: page,
+        PerPage:     perPage,
+        Total:       total,
+        LastPage:    lastPage,
+        HasNext:     page < lastPage,
+        HasPrev:     page > 1,
+    }, nil
 }
 
 func getPageFromContext(c *gin.Context) int {

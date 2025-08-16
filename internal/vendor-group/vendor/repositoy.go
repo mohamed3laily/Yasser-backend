@@ -36,25 +36,28 @@ func (r *repository) GetByID(id uint) (*Vendor, error) {
 }
 
 func (r *repository) GetAll(c *gin.Context, filter VendorFilter) ([]*Vendor, *response.PaginationMeta, error) {
-	var vendors []*Vendor
+    var vendors []*Vendor
 
-	err := r.db.Scopes(
-		database.Paginate(c),
-		r.filterByDistrict(filter.DistrictID),
-		r.filterByCategory(filter.CategoryID),
-		r.filterActive(),
-		r.preloadRelations(),
-	).Find(&vendors).Error
+    baseQuery := r.db.Scopes(
+        r.filterByDistrict(filter.DistrictID),
+        r.filterByCategory(filter.CategoryID),
+        r.filterActive(),
+    )
 
-	if err != nil {
-		return nil, nil, err
-	}
+    dataQuery := baseQuery.Scopes(
+        database.Paginate(c),
+        r.preloadRelations(),
+    )
 
-	paginationInfo, err := database.GetPaginationInfo(c, r.db, &Vendor{})
-	if err != nil {
-		return nil, nil, err
-	}
+    if err := dataQuery.Find(&vendors).Error; err != nil {
+        return nil, nil, err
+    }
 
-	meta := response.FromDatabasePagination(paginationInfo)
-	return vendors, meta, nil
+    paginationInfo, err := database.GetPaginationInfo(c, baseQuery, &Vendor{})
+    if err != nil {
+        return nil, nil, err
+    }
+
+    meta := response.FromDatabasePagination(paginationInfo)
+    return vendors, meta, nil
 }
