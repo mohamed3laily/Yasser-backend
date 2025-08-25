@@ -4,6 +4,7 @@ import (
 	"yasser-backend/internal/auth"
 	"yasser-backend/internal/city"
 	"yasser-backend/internal/item-group/item"
+	"yasser-backend/internal/search"
 	"yasser-backend/internal/user"
 	"yasser-backend/internal/vendor-group/category"
 	"yasser-backend/internal/vendor-group/vendor"
@@ -18,6 +19,7 @@ type Registry struct {
 	vendorRoutes *vendor.Routes
 	cityRoutes *city.Routes
 	itemRoutes *item.Routes
+	searchRoutes *search.Routes
 }
 
 func NewRegistry() *Registry {
@@ -28,6 +30,7 @@ func NewRegistry() *Registry {
 		vendorRoutes: vendor.SetupVendorModule(),
 		cityRoutes: city.SetupCityModule(),
 		itemRoutes: item.SetupItemModule(),
+		searchRoutes: search.SetupSearchModule(search.NewClient("127.0.0.1:7700", "", "Search") ),
 	}
 }
 
