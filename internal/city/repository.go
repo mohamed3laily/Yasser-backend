@@ -2,18 +2,16 @@ package city
 
 import (
 	"errors"
-	"yasser-backend/pkg/database"
-	customerrors "yasser-backend/pkg/errors"
-	"yasser-backend/pkg/response"
+	"yasser-backend/pkg/pagination"
 
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type Repository interface {
-	GetAllCities(c *gin.Context) ([]*City, *response.PaginationMeta, error)
-	GetDistricts(c *gin.Context, cityID *uint) ([]*District, *response.PaginationMeta, error)
+	GetAllCities(search string, page, perPage int) ([]*City, *pagination.Result, error)
+	GetDistricts(cityID *uint, search string, page, perPage int) ([]*District, *pagination.Result, error)
 }
+
 
 type repository struct {
 	db *gorm.DB
@@ -23,53 +21,48 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{db: db}
 }
 
-func (r *repository) GetAllCities(c *gin.Context) ([]*City, *response.PaginationMeta, error) {
+func (r *repository) GetAllCities(search string, page, perPage int) ([]*City, *pagination.Result, error) {
 	var cities []*City
-
-	search := c.Query("search")
 
 	db := r.db.Model(&City{}).Scopes(SearchCityByName(search))
 
-	err := db.Scopes(database.Paginate(c)).Find(&cities).Error
+
+	paginationInfo, err := pagination.GetInfo(db, &City{}, page, perPage)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	paginationInfo, err := database.GetPaginationInfo(c, db, &City{})
+	err = db.Scopes(pagination.Paginate(page, perPage)).Find(&cities).Error
 	if err != nil {
 		return nil, nil, err
 	}
 
-	meta := response.FromDatabasePagination(paginationInfo)
-	return cities, meta, nil
+	return cities, paginationInfo, nil
 }
 
-func (r *repository) GetDistricts(c *gin.Context, cityID *uint) ([]*District, *response.PaginationMeta, error) {
+func (r *repository) GetDistricts(cityID *uint, search string, page, perPage int) ([]*District, *pagination.Result, error) {
 	var districts []*District
 
-	search := c.Query("search")
 	db := r.db.Model(&District{})
 
-	// Apply city filter if provided
+	// Apply filters.
 	if cityID != nil {
 		db = db.Scopes(DistrictByCity(*cityID))
 	}
-
 	db = db.Scopes(SearchDistrictByName(search))
 
-	err := db.Scopes(database.Paginate(c)).Find(&districts).Error
+	paginationInfo, err := pagination.GetInfo(db, &District{}, page, perPage)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	err = db.Scopes(pagination.Paginate(page, perPage)).Find(&districts).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil, customerrors.ErrNotFound
+			return []*District{}, paginationInfo, nil
 		}
 		return nil, nil, err
 	}
 
-	paginationInfo, err := database.GetPaginationInfo(c, db, &District{})
-	if err != nil {
-		return nil, nil, err
-	}
-
-	meta := response.FromDatabasePagination(paginationInfo)
-	return districts, meta, nil
+	return districts, paginationInfo, nil
 }

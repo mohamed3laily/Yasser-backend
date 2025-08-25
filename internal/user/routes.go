@@ -1,6 +1,10 @@
 package user
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"gorm.io/gorm"
+)
 
 type Routes struct {
 	handler *Handler
@@ -26,8 +30,8 @@ func (r *Routes) RegisterRoutes(router *gin.RouterGroup, authMiddleware gin.Hand
 	}
 }
 
-func SetupUserModule() *Routes {
-	userRepo := NewRepository()
+func SetupUserModule(db *gorm.DB, validator *validator.Validate) *Routes {
+	userRepo := NewRepository(db)
 	userService := NewService(userRepo)
 
 	return NewRoutes(userService)

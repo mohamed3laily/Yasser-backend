@@ -4,9 +4,10 @@ import (
 	"strconv"
 
 	"yasser-backend/pkg/context"
-	"yasser-backend/pkg/errors"
+	customerrors "yasser-backend/pkg/errors"
 	"yasser-backend/pkg/locale"
 	"yasser-backend/pkg/response"
+	"yasser-backend/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,16 +21,19 @@ func NewHandler(service Service) *Handler {
 }
 
 func (h *Handler) GetCities(c *gin.Context) {
-	cities, meta, err := h.service.GetAllCities(c)
+	searchQuery := c.Query("search")
+	page := utils.GetPageQuery(c)
+	perPage := utils.GetPerPageQuery(c)
+
+	cities, paginationResult, err := h.service.GetAllCities(searchQuery, page, perPage)
 	if err != nil {
-		appErr := errors.Handle(c, err, "location.city.failed_to_get_all")
+		appErr := customerrors.Handle(c, err, "location.city.failed_to_get_all")
 		response.Error(c, appErr)
 		return
 	}
 
 	lang := context.GetLanguage(c)
 	var citiesResponse []map[string]interface{}
-
 	for _, city := range cities {
 		citiesResponse = append(citiesResponse, map[string]interface{}{
 			"id":   city.ID,
@@ -39,30 +43,34 @@ func (h *Handler) GetCities(c *gin.Context) {
 		})
 	}
 
-	paginated := response.NewPaginatedResponse(citiesResponse, meta)
-	response.Success(c, "location.city.retrieved_successfully", paginated)
+	paginationMeta := response.FromPaginationResult(paginationResult)
+	paginatedResponse := response.NewPaginatedResponse(citiesResponse, paginationMeta)
+	response.Success(c, "location.city.retrieved_successfully", paginatedResponse)
 }
 
 func (h *Handler) GetDistrictsByCity(c *gin.Context) {
 	cidStr := c.Param("id")
 	cid, err := strconv.ParseUint(cidStr, 10, 32)
 	if err != nil {
-		appErr := errors.BadRequest("common.invalid_id").WithContext(c)
+		appErr := customerrors.BadRequest("common.invalid_id").WithContext(c)
 		response.Error(c, appErr)
 		return
 	}
 	cityID := uint(cid)
 
-	districts, meta, err := h.service.GetDistricts(c, &cityID)
+	searchQuery := c.Query("search")
+	page := utils.GetPageQuery(c)
+	perPage := utils.GetPerPageQuery(c)
+
+	districts, paginationResult, err := h.service.GetDistricts(&cityID, searchQuery, page, perPage)
 	if err != nil {
-		appErr := errors.Handle(c, err, "location.district.failed_to_get_all")
+		appErr := customerrors.Handle(c, err, "location.district.failed_to_get_all")
 		response.Error(c, appErr)
 		return
 	}
 
 	lang := context.GetLanguage(c)
 	var districtsResponse []map[string]interface{}
-
 	for _, district := range districts {
 		districtsResponse = append(districtsResponse, map[string]interface{}{
 			"id":     district.ID,
@@ -74,6 +82,7 @@ func (h *Handler) GetDistrictsByCity(c *gin.Context) {
 		})
 	}
 
-	paginated := response.NewPaginatedResponse(districtsResponse, meta)
-	response.Success(c, "location.district.retrieved_successfully", paginated)
+	paginationMeta := response.FromPaginationResult(paginationResult)
+	paginatedResponse := response.NewPaginatedResponse(districtsResponse, paginationMeta)
+	response.Success(c, "location.district.retrieved_successfully", paginatedResponse)
 }

@@ -7,6 +7,7 @@ import (
 	"yasser-backend/pkg/response"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 type LoginRequest struct {
@@ -22,7 +23,7 @@ type Handler struct {
 	service *Service
 }
 
-func NewHandler(service *Service) *Handler {
+func NewHandler(service *Service , validator *validator.Validate) *Handler {
 	return &Handler{service: service}
 }
 

@@ -2,17 +2,15 @@ package vendor
 
 import (
 	"errors"
-	"yasser-backend/pkg/database"
 	customerrors "yasser-backend/pkg/errors"
-	"yasser-backend/pkg/response"
+	"yasser-backend/pkg/pagination"
 
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type Repository interface {
 	GetByID(id uint) (*Vendor, error)
-	GetAll(c *gin.Context, filter VendorFilter) ([]*Vendor, *response.PaginationMeta, error)
+	GetAll(filter VendorFilter, page, perPage int) ([]*Vendor, *pagination.Result, error)
 }
 
 type repository struct {
@@ -35,29 +33,28 @@ func (r *repository) GetByID(id uint) (*Vendor, error) {
 	return &vendor, nil
 }
 
-func (r *repository) GetAll(c *gin.Context, filter VendorFilter) ([]*Vendor, *response.PaginationMeta, error) {
-    var vendors []*Vendor
+func (r *repository) GetAll(filter VendorFilter, page, perPage int) ([]*Vendor, *pagination.Result, error) {
+	var vendors []*Vendor
 
-    baseQuery := r.db.Scopes(
-        r.filterByDistrict(filter.DistrictID),
-        r.filterByCategory(filter.CategoryID),
-        r.filterActive(),
-    )
+	baseQuery := r.db.Model(&Vendor{}).Scopes(
+		r.filterByDistrict(filter.DistrictID),
+		r.filterByCategory(filter.CategoryID),
+		r.filterActive(),
+	)
 
-    dataQuery := baseQuery.Scopes(
-        database.Paginate(c),
-        r.preloadRelations(),
-    )
+	paginationInfo, err := pagination.GetInfo(baseQuery, &Vendor{}, page, perPage)
+	if err != nil {
+		return nil, nil, err
+	}
 
-    if err := dataQuery.Find(&vendors).Error; err != nil {
-        return nil, nil, err
-    }
+	dataQuery := baseQuery.Scopes(
+		pagination.Paginate(page, perPage),
+		r.preloadRelations(),
+	)
 
-    paginationInfo, err := database.GetPaginationInfo(c, baseQuery, &Vendor{})
-    if err != nil {
-        return nil, nil, err
-    }
+	if err := dataQuery.Find(&vendors).Error; err != nil {
+		return nil, nil, err
+	}
 
-    meta := response.FromDatabasePagination(paginationInfo)
-    return vendors, meta, nil
+	return vendors, paginationInfo, nil
 }

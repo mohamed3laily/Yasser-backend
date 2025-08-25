@@ -1,9 +1,8 @@
 package utils
 
 import (
+	"fmt"
 	"strconv"
-	"yasser-backend/pkg/errors"
-	"yasser-backend/pkg/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,20 +17,17 @@ func GetOptionalUintQuery(c *gin.Context, key string) *uint {
 	return nil
 }
 
-func GetDistrictIDFromHeader(c *gin.Context) (uint, bool) {
-	cityIDStr := c.GetHeader("X-District-ID")
-	if cityIDStr == "" {
-		appErr := errors.BadRequest("common.district_id_required").WithContext(c)
-		response.Error(c, appErr)
-		return 0, false
+func GetRequiredUintFromHeader(c *gin.Context, headerName string) (uint, error) {
+	headerValue := c.GetHeader(headerName)
+	if headerValue == "" {
+		return 0, fmt.Errorf("required header '%s' is missing", headerName)
 	}
 
-	cityID, err := strconv.ParseUint(cityIDStr, 10, 64)
+	id, err := strconv.ParseUint(headerValue, 10, 64)
 	if err != nil {
-		appErr := errors.BadRequest("common.invalid_id").WithContext(c)
-		response.Error(c, appErr)
-		return 0, false
+		return 0, fmt.Errorf("invalid value for header '%s': expected a number", headerName)
 	}
 
-	return uint(cityID), true
+	return uint(id), nil
 }
+

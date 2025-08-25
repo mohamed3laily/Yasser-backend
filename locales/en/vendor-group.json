@@ -7,5 +7,6 @@
   "vendor.failed_to_get": "Failed to get vendor",
   "vendor.failed_to_get_all": "Failed to get vendors",
   "vendor.failed_to_create": "Failed to create vendor",
-  "vendor.invalid_input": "Invalid vendor input"
+  "vendor.invalid_input": "Invalid vendor input",
+  "vendor.district_required": "District is required"
 }

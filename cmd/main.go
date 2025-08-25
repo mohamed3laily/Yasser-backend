@@ -2,9 +2,7 @@ package main
 
 import (
 	"log"
-	"os"
-	"yasser-backend/config"
-	"yasser-backend/database"
+	"yasser-backend/bootstrap"
 	"yasser-backend/internal/routes"
 	"yasser-backend/migration"
 	"yasser-backend/pkg/i18n"
@@ -13,25 +11,22 @@ import (
 )
 
 func main() {
-	config.LoadEnv()
-	database.Init()
-	migration.Migrate()
-	
+	deps := bootstrap.NewDependencies()
+
+	migration.Migrate(deps.DB)
+
 	if err := i18n.Init("./locales"); err != nil {
 		log.Fatal("Failed to initialize i18n:", err)
 	}
 
-
 	route := gin.Default()
-
 	route.Use(i18n.LanguageMiddleware())
 
-	registry := routes.NewRegistry()
+	registry := routes.NewRegistry(deps)
 	registry.RegisterAllRoutes(route)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "3000"
+	log.Printf("🚀 Starting server on port %s", deps.Config.Port)
+	if err := route.Run(":" + deps.Config.Port); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
 	}
-	route.Run(":" + port)
 }

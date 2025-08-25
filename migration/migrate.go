@@ -2,17 +2,21 @@ package migration
 
 import (
 	"log"
-	"yasser-backend/database"
 	"yasser-backend/internal/city"
 	"yasser-backend/internal/item-group/item"
 	itemcategory "yasser-backend/internal/item-group/item-category"
 	"yasser-backend/internal/user"
 	"yasser-backend/internal/vendor-group/category"
 	"yasser-backend/internal/vendor-group/vendor"
+
+	"gorm.io/gorm"
 )
 
-func Migrate() {
-	err := database.DB.AutoMigrate(
+
+func Migrate(db *gorm.DB) {
+	log.Println("🚀 Running database migrations...")
+
+	err := db.AutoMigrate(
 		&user.User{},
 		&category.VendorCategory{},
 		&city.City{},
@@ -25,6 +29,8 @@ func Migrate() {
 		&itemcategory.ItemsCategory{},
 	)
 	if err != nil {
-		log.Fatalf("Database migration failed: %v", err)
+		log.Fatalf("❌ Database migration failed: %v", err)
 	}
+
+	log.Println("✅ Migrations completed successfully.")
 }
