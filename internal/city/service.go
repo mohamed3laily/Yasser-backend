@@ -1,15 +1,14 @@
 package city
 
 import (
-	"yasser-backend/pkg/errors"
-	"yasser-backend/pkg/response"
-
-	"github.com/gin-gonic/gin"
+	customerrors "yasser-backend/pkg/errors"
+	"yasser-backend/pkg/pagination"
 )
 
+
 type Service interface {
-	GetAllCities(c *gin.Context) ([]*City, *response.PaginationMeta, error)
-	GetDistricts(c *gin.Context, cityID *uint) ([]*District, *response.PaginationMeta, error)
+	GetAllCities(search string, page, perPage int) ([]*City, *pagination.Result, error)
+	GetDistricts(cityID *uint, search string, page, perPage int) ([]*District, *pagination.Result, error)
 }
 
 type service struct {
@@ -20,13 +19,15 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s *service) GetAllCities(c *gin.Context) ([]*City, *response.PaginationMeta, error) {
-	return s.repo.GetAllCities(c)
+func (s *service) GetAllCities(search string, page, perPage int) ([]*City, *pagination.Result, error) {
+	return s.repo.GetAllCities(search, page, perPage)
 }
 
-func (s *service) GetDistricts(c *gin.Context, cityID *uint) ([]*District, *response.PaginationMeta, error) {
+func (s *service) GetDistricts(cityID *uint, search string, page, perPage int) ([]*District, *pagination.Result, error) {
+
 	if cityID != nil && *cityID == 0 {
-		return nil, nil, errors.ErrInvalid
+		return nil, nil, customerrors.BadRequest("city.invalid_id")
 	}
-	return s.repo.GetDistricts(c, cityID)
+
+	return s.repo.GetDistricts(cityID, search, page, perPage)
 }

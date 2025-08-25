@@ -3,32 +3,22 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
-
-	"yasser-backend/database"
+	"yasser-backend/bootstrap"
 	"yasser-backend/internal/search"
 )
 
 func main() {
-	database.Init()
+	log.Println("🚀 Starting indexing process...")
 
-	meiliHost := getEnv("MEILI_HOST", "http://127.0.0.1:7700")
-	meiliKey := getEnv("MEILI_API_KEY", "")
+	deps := bootstrap.NewDependencies()
 
-	client := search.NewClient(meiliHost, meiliKey, "Search")
-	repo := search.NewRepository(database.DB)
-	service := search.NewService(client, repo)
+	searchRepo := search.NewRepository(deps.DB)
+	searchService := search.NewService(deps.SearchClient, searchRepo)
 
-	if err := service.IndexData(); err != nil {
+	log.Println("📚 Fetching data and indexing in Meilisearch...")
+	if err := searchService.IndexData(); err != nil {
 		log.Fatalf("❌ Indexing failed: %v", err)
 	}
 
-	fmt.Println("✅ Indexing completed successfully")
-}
-
-func getEnv(key, fallback string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return fallback
+	fmt.Println("✅ Indexing completed successfully.")
 }

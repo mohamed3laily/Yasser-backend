@@ -46,7 +46,3 @@ func (s *Service) UpdateLastLogin(ctx context.Context, userID uint) error {
 func (s *Service) GetUserByID(userID uint) (*User, error) {
 	return s.repo.FindByID(userID)
 }
-
-func GetUserByID(userID uint) (*User, error) {
-	return NewRepository().FindByID(userID)
-}

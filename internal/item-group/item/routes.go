@@ -1,17 +1,17 @@
 package item
 
 import (
-	"yasser-backend/database"
-
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"gorm.io/gorm"
 )
 
 type Routes struct {
 	handler *Handler
 }
 
-func SetupItemModule() *Routes {
-	repo := NewRepository(database.DB)
+func SetupItemModule(db *gorm.DB, validator *validator.Validate) *Routes {
+	repo := NewRepository(db)
 	service := NewService(repo)
 	handler := NewHandler(service)
 

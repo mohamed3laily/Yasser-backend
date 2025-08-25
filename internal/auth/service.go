@@ -20,7 +20,7 @@ type Service struct {
 	waSender *WhatsAppSender
 }
 
-func NewService(authRepo Repository, userRepo user.Repository, waSender *WhatsAppSender) *Service {
+func NewService(authRepo Repository, userRepo user.Repository, waSender *WhatsAppSender, jwtSecret string) *Service {
 	return &Service{
 		authRepo: authRepo,
 		userRepo: userRepo,

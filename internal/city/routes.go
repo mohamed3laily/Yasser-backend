@@ -1,9 +1,8 @@
 package city
 
 import (
-	"yasser-backend/database"
-
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type Routes struct {
@@ -16,8 +15,8 @@ func NewRoutes(service Service) *Routes {
 	}
 }
 
-func SetupCityModule() *Routes {
-	repo := NewRepository(database.DB)
+func SetupCityModule(db *gorm.DB) *Routes {
+	repo := NewRepository(db)
 	service := NewService(repo)
 	handler := NewHandler(service)
 	return &Routes{handler: handler}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/meilisearch/meilisearch-go"
@@ -35,7 +36,6 @@ func (c *Client) setupIndex() {
 	searchableAttributes := []string{
 		"nameEn",
 		"nameAr", 
-		"description",
 		"vendorName",
 		"items",
 	}
@@ -43,7 +43,7 @@ func (c *Client) setupIndex() {
 	filterableAttributes := []string{
 		"type",
 		"vendorId",
-		"cityId",
+		"districtId",
 		"categoryId",
 		"isActive",
 	}
@@ -88,24 +88,19 @@ func (c *Client) AddDocuments(documents []SearchDocument) error {
 
 func (c *Client) Search(request SearchRequest) ([]SearchResponse, error) {
 	searchReq := &meilisearch.SearchRequest{
-		Limit: int64(request.Limit),
+		Limit:  int64(request.Limit),
+		Offset: int64(request.Offset),
 	}
 
-	// Add filters
-	filters := []string{"isActive = true"}
-	if request.Type != "" {
-		filters = append(filters, fmt.Sprintf("type = '%s'", request.Type))
+	var filters []string
+	filters = append(filters, "isActive = true")
+	filters = append(filters, fmt.Sprintf("districtId = %d", request.DistrictID))
+	if request.Type != nil && *request.Type != "" {
+		filters = append(filters, fmt.Sprintf("type = '%s'", *request.Type))
 	}
-
+	
 	if len(filters) > 0 {
-		filterStr := ""
-		for i, filter := range filters {
-			if i > 0 {
-				filterStr += " AND "
-			}
-			filterStr += filter
-		}
-		searchReq.Filter = filterStr
+		searchReq.Filter = strings.Join(filters, " AND ")
 	}
 
 	searchResult, err := c.index.Search(request.Query, searchReq)
@@ -121,20 +116,22 @@ func (c *Client) mapHitsToResponse(hits meilisearch.Hits, lang string) []SearchR
 
 	for _, hitMap := range hits {
 		name := c.getLocalizedField(hitMap, "nameEn", "nameAr", lang)
-		description := c.getString(hitMap, "description")
+		description := c.getLocalizedField(hitMap, "descriptionEn", "descriptionAr", lang)
+		vendorName := c.getLocalizedField(hitMap, "vendorNameEn", "vendorNameAr", lang)
 
 		response := SearchResponse{
-			ID:          c.getString(hitMap, "id"),
-			Type:        c.getString(hitMap, "type"),
-			Name:        name,
-			Description: description,
-			Picture:     c.getString(hitMap, "picture"),
-			BasePrice:   c.getInt(hitMap, "basePrice"),
-			VendorID:    c.getUint(hitMap, "vendorId"),
-			VendorName:  c.getString(hitMap, "vendorName"),
-			CategoryID:  c.getUint(hitMap, "categoryId"),
+			ID:              c.getString(hitMap, "id"),
+			Type:            c.getString(hitMap, "type"),
+			Name:            name,
+			Description:     description,
+			VendorName:      vendorName,
+			Picture:         c.getString(hitMap, "picture"),
+			BasePrice:       c.getInt(hitMap, "basePrice"),
+			DiscountPercent: c.getFloat(hitMap, "discountPercent"),
+			DiscountedPrice: c.getInt(hitMap, "discountedPrice"),
+			VendorID:        c.getUint(hitMap, "vendorId"),
+			CategoryID:      c.getUint(hitMap, "categoryId"),
 		}
-
 		responses = append(responses, response)
 	}
 
@@ -148,6 +145,16 @@ func (c *Client) getLocalizedField(hitMap meilisearch.Hit, enField, arField, lan
 		}
 	}
 	return c.getString(hitMap, enField)
+}
+
+func (c *Client) getFloat(hitMap meilisearch.Hit, key string) float64 {
+	if raw, ok := hitMap[key]; ok {
+		var n float64
+		if err := json.Unmarshal(raw, &n); err == nil {
+			return n
+		}
+	}
+	return 0.0
 }
 
 

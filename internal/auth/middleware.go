@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func JWTAuthMiddleware() gin.HandlerFunc {
+func JWTAuthMiddleware(userService *user.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if !strings.HasPrefix(authHeader, "Bearer ") {
@@ -25,7 +25,7 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		u, err := user.GetUserByID(claims.UserID)
+		u, err := userService.GetUserByID(claims.UserID)
 		if err != nil || u.Status != user.ACTIVE {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found or inactive"})
 			c.Abort()

@@ -1,36 +1,35 @@
 package search
 
 import (
-	"yasser-backend/database"
-
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"gorm.io/gorm"
 )
 
 type Routes struct {
 	handler *Handler
 }
 
-func NewRoutes(service Service, validator *validator.Validate) *Routes {
+func NewRoutes(handler *Handler) *Routes {
 	return &Routes{
-		handler: NewHandler(service, validator),
+		handler: handler,
 	}
 }
 
-func SetupSearchModule(client *Client) *Routes {
-	repo := NewRepository(database.DB)
+
+func SetupSearchModule(db *gorm.DB, client *Client, validator *validator.Validate) *Routes {
+	repo := NewRepository(db)
+
 	service := NewService(client, repo)
 
-	validator := validator.New()
+	handler := NewHandler(service, validator)
 
-	return &Routes{
-		handler: NewHandler(service, validator),
-	}
+	return NewRoutes(handler)
 }
 
 func (r *Routes) RegisterRoutes(router *gin.RouterGroup) {
 	searchGroup := router.Group("/search")
 	{
-		searchGroup.GET("", r.handler.Search) // /api/search?query=shawarma&type=item
+		searchGroup.GET("", r.handler.Search)
 	}
 }

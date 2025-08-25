@@ -2,15 +2,14 @@ package vendor
 
 import (
 	"yasser-backend/internal/item-group/item"
-	"yasser-backend/pkg/errors"
-	"yasser-backend/pkg/response"
-
-	"github.com/gin-gonic/gin"
+	customerrors "yasser-backend/pkg/errors"
+	"yasser-backend/pkg/pagination"
 )
 
+
 type Service interface {
-	GetVendorByID(id uint , lang string) (*VendorResponse, error )
-	GetAllVendors(c *gin.Context, filter VendorFilter) ([]*Vendor, *response.PaginationMeta, error)
+	GetVendorByID(id uint, lang string) (*VendorResponse, error)
+	GetAllVendors(filter VendorFilter, page, perPage int) ([]*Vendor, *pagination.Result, error)
 }
 
 type service struct {
@@ -24,7 +23,7 @@ func NewService(repo Repository, itemService item.Service) Service {
 
 func (s *service) GetVendorByID(id uint, lang string) (*VendorResponse, error) {
 	if id == 0 {
-		return nil, errors.ErrInvalid
+		return nil, customerrors.BadRequest("vendor.invalid_id")
 	}
 
 	vendor, err := s.repo.GetByID(id)
@@ -42,9 +41,9 @@ func (s *service) GetVendorByID(id uint, lang string) (*VendorResponse, error) {
 	return resp, nil
 }
 
-func (s *service) GetAllVendors(c *gin.Context, filter VendorFilter) ([]*Vendor, *response.PaginationMeta, error) {
+func (s *service) GetAllVendors(filter VendorFilter, page, perPage int) ([]*Vendor, *pagination.Result, error) {
 	if filter.DistrictID == 0 {
-		return nil, nil, errors.ErrInvalid
+		return nil, nil, customerrors.BadRequest("vendor.district_required")
 	}
-	return s.repo.GetAll(c, filter)
+	return s.repo.GetAll(filter, page, perPage)
 }

@@ -3,6 +3,7 @@ package database
 import (
 	"math"
 	"strconv"
+	"yasser-backend/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -25,16 +26,16 @@ const (
 
 func Paginate(c *gin.Context) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		page := getPageFromContext(c)
-		perPage := getPerPageFromContext(c)
+		page := utils.GetPageQuery(c)
+		perPage := utils.GetPerPageQuery(c)
 		offset := (page - 1) * perPage
 		return db.Offset(offset).Limit(perPage)
 	}
 }
 
 func GetPaginationInfo(c *gin.Context, db *gorm.DB, model interface{}) (*PaginationResult, error) {
-    page := getPageFromContext(c)
-    perPage := getPerPageFromContext(c)
+    page := utils.GetPageQuery(c)
+    perPage := utils.GetPerPageQuery(c)
 
     var total int64
     if err := db.Model(model).Count(&total).Error; err != nil {
@@ -63,15 +64,4 @@ func getPageFromContext(c *gin.Context) int {
 		return DefaultPage
 	}
 	return page
-}
-
-func getPerPageFromContext(c *gin.Context) int {
-	perPageStr := c.DefaultQuery("per_page", strconv.Itoa(DefaultPerPage))
-	perPage, err := strconv.Atoi(perPageStr)
-	if err != nil || perPage <= 0 {
-		perPage = DefaultPerPage
-	} else if perPage > MaxPerPage {
-		perPage = MaxPerPage
-	}
-	return perPage
 }

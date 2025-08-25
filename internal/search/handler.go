@@ -1,10 +1,10 @@
 package search
 
 import (
-	"strconv"
 	"yasser-backend/pkg/context"
 	customerrors "yasser-backend/pkg/errors"
 	"yasser-backend/pkg/response"
+	"yasser-backend/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -15,7 +15,6 @@ type Handler struct {
 	validator *validator.Validate
 }
 
-// NewHandler creates a new search handler with its dependencies.
 func NewHandler(service Service, validator *validator.Validate) *Handler {
 	return &Handler{
 		service:   service,
@@ -25,29 +24,36 @@ func NewHandler(service Service, validator *validator.Validate) *Handler {
 
 func (h *Handler) Search(c *gin.Context) {
 	var req SearchRequest
-	
-	// Get query parameters
+
 	req.Query = c.Query("query")
 	req.Lang = context.GetLanguage(c)
-	req.Type = c.Query("type")
 	
-	if limitStr := c.Query("limit"); limitStr != "" {
-		if limit, err := strconv.Atoi(limitStr); err == nil {
-			req.Limit = limit
-		}
+    districtID, err := utils.GetRequiredUintFromHeader(c, "X-District-ID")
+    if err != nil {
+
+        appErr := customerrors.BadRequest("vendor.district_required")
+        response.Error(c, appErr)
+        return
+    }
+
+	req.DistrictID = districtID
+
+	if typeVal := c.Query("type"); typeVal != "" {
+		req.Type = &typeVal
 	}
 
-	// Validate request (optional, but good practice)
+	req.Limit = utils.GetIntQuery(c, "limit", 20)
+	req.Offset = utils.GetIntQuery(c, "offset", 0)
+
 	if err := h.validator.Struct(req); err != nil {
-		appErr := customerrors.BadRequest("search.invalid_request").WithContext(c)
+		appErr := customerrors.BadRequest("common.request_failed")
 		response.Error(c, appErr)
 		return
 	}
 
-	// Perform search
 	results, err := h.service.Search(req)
 	if err != nil {
-		appErr := customerrors.Handle(c, err, "search.failed")
+		appErr := customerrors.Handle(c, err, "common.request_failed")
 		response.Error(c, appErr)
 		return
 	}
@@ -56,5 +62,7 @@ func (h *Handler) Search(c *gin.Context) {
 		"results": results,
 		"query":   req.Query,
 		"count":   len(results),
+		"limit":   req.Limit,
+		"offset":  req.Offset,
 	})
 }

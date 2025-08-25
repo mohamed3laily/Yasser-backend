@@ -7,5 +7,6 @@
   "vendor.failed_to_get": "فشل في استرجاع البائع",
   "vendor.failed_to_get_all": "فشل في استرجاع البائعين",
   "vendor.failed_to_create": "فشل في إنشاء البائع",
-  "vendor.invalid_input": "بيانات البائع غير صحيحة"
+  "vendor.invalid_input": "بيانات البائع غير صحيحة",
+  "vendor.district_required": "الحي مطلوب"
 }

@@ -1,25 +1,25 @@
 package category
 
 import (
-	"yasser-backend/database"
-
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"gorm.io/gorm"
 )
 
 type Routes struct {
 	handler *Handler
 }
 
-func NewRoutes(service Service) *Routes {
+func NewRoutes(service Service, validator *validator.Validate) *Routes {
 	return &Routes{
-		handler: NewHandler(service),
+		handler: NewHandler(service , validator),
 	}
 }
 
-func SetupCategoryModule() *Routes {
-	repo := NewRepository(database.DB)
+func SetupCategoryModule(db *gorm.DB, validator *validator.Validate) *Routes {
+	repo := NewRepository(db)
 	service := NewService(repo)
-	handler := NewHandler(service)
+	handler := NewHandler(service, validator)
 
 	return &Routes{
 		handler: handler,

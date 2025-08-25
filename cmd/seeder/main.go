@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"yasser-backend/database"
+	"yasser-backend/bootstrap"
 	"yasser-backend/internal/city"
 	"yasser-backend/internal/vendor-group/category"
 	"yasser-backend/internal/vendor-group/vendor"
@@ -11,21 +11,21 @@ import (
 )
 
 func main() {
-	database.Init()
+	deps := bootstrap.NewDependencies()
 
-	if err := category.Seed(database.DB); err != nil {
+	if err := category.Seed(deps.DB); err != nil {
 		log.Fatalf("❌ Failed to seed category: %v", err)
 	}
 
-	if err := city.Seed(database.DB); err != nil {
+	if err := city.Seed(deps.DB); err != nil {
 		log.Fatalf("❌ Failed to seed city & districts: %v", err)
 	}
 
-	if err := vendor.Seed(database.DB); err != nil {
+	if err := vendor.Seed(deps.DB); err != nil {
 		log.Fatalf("❌ Failed to seed vendors: %v", err)
 	}
 
-	if err := seeder.SeedItemsAndCategories(database.DB); err != nil {
+	if err := seeder.SeedItemsAndCategories(deps.DB); err != nil {
 		log.Fatalf("❌ Failed to seed items: %v", err)
 	}
 
