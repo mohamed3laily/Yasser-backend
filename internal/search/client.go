@@ -34,10 +34,11 @@ func NewClient(host, apiKey, indexName string) *Client {
 
 func (c *Client) setupIndex() {
 	searchableAttributes := []string{
+		"items",
 		"nameEn",
 		"nameAr", 
-		"vendorName",
-		"items",
+		"vendorNameEn",
+		"vendorNameAr",
 	}
 
 	filterableAttributes := []string{
@@ -116,8 +117,13 @@ func (c *Client) mapHitsToResponse(hits meilisearch.Hits, lang string) []SearchR
 
 	for _, hitMap := range hits {
 		name := c.getLocalizedField(hitMap, "nameEn", "nameAr", lang)
+		
+
 		description := c.getLocalizedField(hitMap, "descriptionEn", "descriptionAr", lang)
 		vendorName := c.getLocalizedField(hitMap, "vendorNameEn", "vendorNameAr", lang)
+		discountPercent := c.getFloat(hitMap, "discountPercent")
+		discountedPrice := c.getInt(hitMap, "discountedPrice")
+		basePrice := c.getInt(hitMap, "basePrice")
 
 		response := SearchResponse{
 			ID:              c.getString(hitMap, "id"),
@@ -126,9 +132,9 @@ func (c *Client) mapHitsToResponse(hits meilisearch.Hits, lang string) []SearchR
 			Description:     description,
 			VendorName:      vendorName,
 			Picture:         c.getString(hitMap, "picture"),
-			BasePrice:       c.getInt(hitMap, "basePrice"),
-			DiscountPercent: c.getFloat(hitMap, "discountPercent"),
-			DiscountedPrice: c.getInt(hitMap, "discountedPrice"),
+			BasePrice:       basePrice,
+			DiscountPercent: discountPercent,
+			DiscountedPrice: discountedPrice,
 			VendorID:        c.getUint(hitMap, "vendorId"),
 			CategoryID:      c.getUint(hitMap, "categoryId"),
 		}

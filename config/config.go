@@ -6,21 +6,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// Config holds all typed configuration for the application.
-
-// WATTSI_INSTANCE_ID=68910B3A4BD70
-// WATTSI_ACCESS_TOKEN=6891055b330cf
-// JWT_SECRET="your_jwt_secret_here"
-
-// DB_HOST=localhost
-// DB_PORT=5432
-// DB_USER=educatly
-// DB_PASSWORD=password1
-// DB_NAME=yasser-dev
-
-// DATABASE_URL=postgresql://educatly:password1@localhost:5432/yasser-dev?sslmode=disable
-
-// MEILI_HOST=http://localhost:7700
 type Config struct {
 	// Server
 	Port string
@@ -45,9 +30,7 @@ type Config struct {
 	JWTSecret string
 }
 
-// Load creates a new Config struct and populates it from environment variables.
 func Load() *Config {
-	// Load .env file. It's safe to ignore the error if it doesn't exist.
 	_ = godotenv.Load()
 
 	return &Config{
@@ -65,7 +48,6 @@ func Load() *Config {
 	}
 }
 
-// getEnv is a helper to read an environment variable or return a fallback.
 func getEnv(key, fallback string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value

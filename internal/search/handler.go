@@ -58,7 +58,7 @@ func (h *Handler) Search(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, "search.success", map[string]interface{}{
+	response.Success(c, "request success", map[string]interface{}{
 		"results": results,
 		"query":   req.Query,
 		"count":   len(results),
