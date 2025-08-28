@@ -1,9 +1,11 @@
 package search
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 	"time"
 
@@ -18,7 +20,17 @@ type Client struct {
 
 func NewClient(host, apiKey, indexName string) *Client {
 	fmt.Println("Connecting to Meilisearch...")
-	client := meilisearch.New(host, meilisearch.WithAPIKey(apiKey))
+		tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ⚠ Insecure
+	}
+	httpClient := &http.Client{Transport: tr}
+
+	// Create Meilisearch client with custom HTTP client
+	client := meilisearch.New(
+		host,
+		meilisearch.WithAPIKey(apiKey),
+		meilisearch.WithCustomClient(httpClient),
+	)
 	fmt.Println("Connected to Meilisearch")
 	index := client.Index(indexName)
 
