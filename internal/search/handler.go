@@ -1,6 +1,7 @@
 package search
 
 import (
+	"fmt"
 	"yasser-backend/pkg/context"
 	customerrors "yasser-backend/pkg/errors"
 	"yasser-backend/pkg/response"
@@ -47,13 +48,16 @@ func (h *Handler) Search(c *gin.Context) {
 
 	if err := h.validator.Struct(req); err != nil {
 		appErr := customerrors.BadRequest("common.request_failed")
+		fmt.Println(err)
 		response.Error(c, appErr)
 		return
 	}
 
 	results, err := h.service.Search(req)
 	if err != nil {
+		fmt.Println(err)
 		appErr := customerrors.Handle(c, err, "common.request_failed")
+		
 		response.Error(c, appErr)
 		return
 	}

@@ -29,11 +29,12 @@ func NewService(authRepo Repository, userRepo user.Repository, waSender *WhatsAp
 }
 
 func (s *Service) Login(phoneNumber string) error {
-	otp, err := s.generateOTP()
-	if err != nil {
-		return err
-	}
-
+	// redo after subscripe to wattsi
+	// otp, err := s.generateOTP()
+	// if err != nil {
+	// 	return err
+	// }
+	otp := "123456"
 	hashedOtp, err := bcrypt.GenerateFromPassword([]byte(otp), bcrypt.DefaultCost)
 	if err != nil {
 		return err
