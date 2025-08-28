@@ -17,8 +17,9 @@ type Client struct {
 }
 
 func NewClient(host, apiKey, indexName string) *Client {
+	fmt.Println("Connecting to Meilisearch...")
 	client := meilisearch.New(host, meilisearch.WithAPIKey(apiKey))
-	
+	fmt.Println("Connected to Meilisearch")
 	index := client.Index(indexName)
 
 	c := &Client{
