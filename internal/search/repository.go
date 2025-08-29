@@ -21,26 +21,11 @@ func NewRepository(db *gorm.DB) Repository {
 }
 
 func (r *repository) GetAllItemsForIndexing() ([]SearchDocument, error) {
-	var results []struct {
-		ID              uint    `json:"id"`
-		NameEn          string  `json:"nameEn"`
-		NameAr          string  `json:"nameAr"`
-		DescriptionEn   string  `json:"descriptionEn"`
-		DescriptionAr   string  `json:"descriptionAr"`
-		Picture         string  `json:"picture"`
-		BasePrice       int     `json:"basePrice"`
-		DiscountPercent float64 `json:"discountPercent"`
-		VendorID        uint    `json:"vendorId"`
-		CategoryID      uint    `json:"categoryId"`
-		IsActive        bool    `json:"isActive"`
-		VendorNameEn    string  `json:"vendorNameEn"`
-		VendorNameAr    string  `json:"vendorNameAr"`
-		DistrictID      uint    `json:"districtId"`
-	}
+	var results []ItemDTO
 
 	err := r.db.Table("items i").
 		Select(`i.id, i.name_en, i.name_ar, i.description_en, i.description_ar, 
-			   i.picture, i.base_price, i.discount_percent, i.vendor_id, i.category_id, i.is_active,
+			   i.picture ,i.base_price, i.discount_percent, i.vendor_id, i.category_id, i.is_active,
 			   v.name_en as vendor_name_en, v.name_ar as vendor_name_ar, v.district_id`).
 		Joins("LEFT JOIN vendors v ON v.id = i.vendor_id").
 		Where("i.is_active = ?", true).
@@ -51,10 +36,9 @@ func (r *repository) GetAllItemsForIndexing() ([]SearchDocument, error) {
 	}
 
 	documents := make([]SearchDocument, 0, len(results))
+	fmt.Println("Items length: ", len(results))
+	
 	for _, item := range results {
-		discountMultiplier := 1.0 - (item.DiscountPercent / 100.0)
-		discountedPrice := float64(item.BasePrice) * discountMultiplier
-
 		doc := SearchDocument{
 			ID:              fmt.Sprintf("item_%d", item.ID),
 			Type:            "item",
@@ -67,7 +51,6 @@ func (r *repository) GetAllItemsForIndexing() ([]SearchDocument, error) {
 			Picture:         item.Picture,
 			BasePrice:       item.BasePrice,
 			DiscountPercent: item.DiscountPercent,
-			DiscountedPrice: int(math.Round(discountedPrice)),
 			VendorID:        item.VendorID,
 			CategoryID:      item.CategoryID,
 			DistrictID:      item.DistrictID,
@@ -80,20 +63,10 @@ func (r *repository) GetAllItemsForIndexing() ([]SearchDocument, error) {
 }
 
 func (r *repository) GetAllVendorsForIndexing() ([]SearchDocument, error) {
-	var results []struct {
-		ID             uint   `json:"id"`
-		NameEn         string `json:"nameEn"`
-		NameAr         string `json:"nameAr"`
-		DescriptionEn  string `json:"descriptionEn"`
-		DescriptionAr  string `json:"descriptionAr"`
-		ProfilePicture string `json:"profilePicture"`
-		CategoryID     uint   `json:"categoryId"`
-		IsActive       bool   `json:"isActive"`
-		DistrictID     uint   `json:"districtId"`
-	}
+	var results []VendorDTO
 
 	err := r.db.Table("vendors").
-		Select("id, name_en, name_ar, description_en, description_ar, profile_picture, category_id, is_active, district_id").
+		Select("id, name_en, name_ar, description_en, description_ar, profile_picture, cover_picture, category_id, is_active, district_id").
 		Where("is_active = ?", true).
 		Scan(&results).Error
 
@@ -120,6 +93,7 @@ func (r *repository) GetAllVendorsForIndexing() ([]SearchDocument, error) {
 			DescriptionEn: vendor.DescriptionEn,
 			DescriptionAr: vendor.DescriptionAr,
 			Picture:       vendor.ProfilePicture,
+			CoverPicture:  vendor.CoverPicture,
 			CategoryID:    vendor.CategoryID,
 			Items:         itemNames,
 			DistrictID:    vendor.DistrictID,
@@ -129,4 +103,23 @@ func (r *repository) GetAllVendorsForIndexing() ([]SearchDocument, error) {
 	}
 
 	return documents, nil
+}
+
+func (r *repository) calculateFinalPrice(basePrice int, discountPercent float64) int {
+	// If no discount or invalid discount, return base price
+	if discountPercent <= 0 || basePrice <= 0 {
+		return basePrice
+	}
+	
+	// Calculate discounted price
+	discountMultiplier := 1.0 - (discountPercent / 100.0)
+	discountedPrice := float64(basePrice) * discountMultiplier
+	
+	// Ensure we don't return a price below 0
+	finalPrice := int(math.Round(discountedPrice))
+	if finalPrice < 0 {
+		return 0
+	}
+	
+	return finalPrice
 }
