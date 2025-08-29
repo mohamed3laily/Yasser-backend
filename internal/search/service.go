@@ -22,16 +22,9 @@ func NewService(client *Client, repo Repository) Service {
 }
 
 func (s *service) Search(request SearchRequest) ([]SearchResponse, error) {
-	// Set default limit if not provided
 	if request.Limit == 0 {
 		request.Limit = 20
 	}
-
-	// Set default language if not provided
-	if request.Lang == "" {
-		request.Lang = "en"
-	}
-
 	return s.client.Search(request)
 }
 

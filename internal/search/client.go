@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"yasser-backend/internal/pricing"
 
 	"github.com/meilisearch/meilisearch-go"
 )
@@ -19,9 +20,9 @@ type Client struct {
 }
 
 func NewClient(host, apiKey, indexName string) *Client {
-	fmt.Println("Connecting to Meilisearch...")
+	// secure this on production
 		tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ⚠ Insecure
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	httpClient := &http.Client{Transport: tr}
 
@@ -31,7 +32,6 @@ func NewClient(host, apiKey, indexName string) *Client {
 		meilisearch.WithAPIKey(apiKey),
 		meilisearch.WithCustomClient(httpClient),
 	)
-	fmt.Println("Connected to Meilisearch")
 	index := client.Index(indexName)
 
 	c := &Client{
@@ -133,25 +133,33 @@ func (c *Client) mapHitsToResponse(hits meilisearch.Hits, lang string) []SearchR
 		
 
 		description := c.getLocalizedField(hitMap, "descriptionEn", "descriptionAr", lang)
-		vendorName := c.getLocalizedField(hitMap, "vendorNameEn", "vendorNameAr", lang)
-		discountPercent := c.getFloat(hitMap, "discountPercent")
-		discountedPrice := c.getInt(hitMap, "discountedPrice")
-		basePrice := c.getInt(hitMap, "basePrice")
+		docType := c.getString(hitMap, "type")
 
 		response := SearchResponse{
-			ID:              c.getString(hitMap, "id"),
-			Type:            c.getString(hitMap, "type"),
-			Name:            name,
-			Description:     description,
-			VendorName:      vendorName,
-			Picture:         c.getString(hitMap, "picture"),
-			BasePrice:       basePrice,
-			DiscountPercent: discountPercent,
-			DiscountedPrice: discountedPrice,
-			VendorID:        c.getUint(hitMap, "vendorId"),
-			CategoryID:      c.getUint(hitMap, "categoryId"),
+			ID:          c.getString(hitMap, "id"),
+			Type:        docType,
+			Name:        name,
+			Description: description,
+			Picture:     c.getString(hitMap, "picture"),
+			CoverPicture: c.getString(hitMap, "coverPicture"),
+			CategoryID:  c.getUint(hitMap, "categoryId"),
 		}
+
+		if docType == "item" {
+			vendorName := c.getLocalizedField(hitMap, "vendorNameEn", "vendorNameAr", lang)
+			basePrice := c.getInt(hitMap, "basePrice")
+			discountPercent := c.getFloat(hitMap, "discountPercent")
+			finalPrice := pricing.CalculateFinalPrice(basePrice, discountPercent)
+
+			response.VendorName = vendorName
+			response.BasePrice = basePrice
+			response.DiscountPercent = discountPercent
+			response.Price = finalPrice
+			response.VendorID = c.getUint(hitMap, "vendorId")
+		}
+
 		responses = append(responses, response)
+	
 	}
 
 	return responses
