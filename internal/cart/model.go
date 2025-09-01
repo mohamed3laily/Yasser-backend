@@ -1,11 +1,14 @@
 package cart
 
+import "github.com/lib/pq"
+
+
 type CartItem struct {
 	ItemID    int64   `json:"itemId" validate:"required"`
 	Quantity  int     `json:"quantity" validate:"required,min=1"`
 	SizeID    *int64  `json:"sizeId,omitempty"`
 	VariantID *int64  `json:"variantId,omitempty"`
-	AddonIDs  []int64 `json:"addonIds,omitempty"`
+	AddonIDs  pq.Int64Array  `gorm:"type:bigint[]" json:"addonIds,omitempty"`
 }
 
 type ValidatedItemInfo struct {

@@ -30,9 +30,9 @@ func Migrate(db *gorm.DB) {
 		&item.ItemVariant{},
 		&itemcategory.ItemsCategory{},
 		&cart.CartItem{},
+	    &order.Order{},
 		&order.OrderItem{},
 		&order.OrderItemAddon{},
-		&order.Order{},
 	)
 	if err != nil {
 		log.Fatalf("❌ Database migration failed: %v", err)

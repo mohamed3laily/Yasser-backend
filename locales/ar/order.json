@@ -1,0 +1,7 @@
+{
+  "order.creation_failed": "فشل إنشاء الطلب",
+  "order.created_success": "تم إنشاء الطلب بنجاح",
+  "order.invalid_cart": "السلة تحتوي على عناصر غير صالحة",
+  "order.stock_update_failed": "فشل في تحديث مخزون العنصر",
+  "order.item_conversion_failed": "فشل في معالجة عنصر السلة"
+}

@@ -1,0 +1,7 @@
+{
+  "order.creation_failed": "Order creation failed",
+  "order.created_success": "Order created successfully",
+  "order.invalid_cart": "Cart contains invalid items",
+  "order.stock_update_failed": "Failed to update item stock",
+  "order.item_conversion_failed": "Failed to process cart item"
+}

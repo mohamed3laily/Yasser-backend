@@ -1,0 +1,13 @@
+{
+  "cart.invalid_vendor_id": "معرف التاجر المقدم غير صالح",
+  "cart.validation_failed": "فشل التحقق من السلة",
+  "cart.validation_success": "تم التحقق من السلة بنجاح",
+  "cart.item_not_found": "العنصر غير موجود أو غير نشط",
+  "cart.item_vendor_mismatch": "العنصر لا ينتمي للتاجر المحدد",
+  "cart.insufficient_stock": "مخزون غير كافي. المتاح: {{.available}}، المطلوب: {{.requested}}",
+  "cart.invalid_size": "اختيار حجم غير صالح",
+  "cart.invalid_variant": "اختيار نوع غير صالح",
+  "cart.invalid_addon": "اختيار إضافة غير صالح: {{.addonId}}",
+  "cart.empty_cart": "السلة لا يمكن أن تكون فارغة",
+  "cart.invalid_items": "بعض العناصر في السلة غير صالحة"
+}
