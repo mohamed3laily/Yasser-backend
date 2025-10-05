@@ -28,7 +28,7 @@ func (r *Routes) GetService() Service {
 }
 
 func (r *Routes) RegisterRoutes(router *gin.RouterGroup) {
-	cartGroup := router.Group("/vendors/:vendorId/cart")
+	cartGroup := router.Group("/cart")
 	{
 		cartGroup.POST("/validate", r.handler.ValidateCart)
 	}

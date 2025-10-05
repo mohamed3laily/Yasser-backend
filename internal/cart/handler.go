@@ -1,7 +1,6 @@
 package cart
 
 import (
-	"strconv"
 	"yasser-backend/pkg/errors"
 	"yasser-backend/pkg/response"
 
@@ -22,33 +21,27 @@ func NewHandler(service Service, validator *validator.Validate) *Handler {
 }
 
 func (h *Handler) ValidateCart(c *gin.Context) {
-	vendorIDStr := c.Param("vendorId")
-	vendorID, err := strconv.ParseInt(vendorIDStr, 10, 64)
-	if err != nil {
-		appErr := errors.BadRequest("cart.invalid_vendor_id").WithContext(c)
-		response.Error(c, appErr)
-		return
-	}
-	
 	var request CartValidationRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		response.ValidationError(c, err)
 		return
 	}
-	
-	request.VendorID = vendorID
-	
+
 	if err := h.validator.Struct(&request); err != nil {
 		response.ValidationError(c, err)
 		return
 	}
-	
-	validationResult, err := h.service.ValidateCart(request)
+
+	validationResult, err := h.service.ValidateCart(c.Request.Context(), request)
 	if err != nil {
 		appErr := errors.Handle(c, err, "cart.validation_failed")
 		response.Error(c, appErr)
 		return
 	}
-	
-	response.Success(c, "cart.validation_success", validationResult)
+
+	if validationResult.IsValid {
+		response.Success(c, "cart.validation_success", validationResult)
+	} else {
+		response.Success(c, "cart.validation_failed", validationResult)
+	}
 }
