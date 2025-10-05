@@ -3,6 +3,7 @@ package routes
 import (
 	"yasser-backend/bootstrap"
 	"yasser-backend/internal/auth"
+	"yasser-backend/internal/cart"
 	"yasser-backend/internal/city"
 	"yasser-backend/internal/item-group/item"
 	"yasser-backend/internal/search"
@@ -21,9 +22,12 @@ type Registry struct {
 	cityRoutes *city.Routes
 	itemRoutes *item.Routes
 	searchRoutes *search.Routes
+	cartRoutes *cart.Routes
+	//orderRoutes *order.Routes
 }
 
 func NewRegistry(deps *bootstrap.AppDependencies) *Registry {
+	cartModule := cart.SetupCartModule(deps.DB, deps.Validator)
 	return &Registry{
 
 		authRoutes:     auth.SetupAuthModule(deps.DB, deps.Validator, deps.Config),
@@ -33,6 +37,8 @@ func NewRegistry(deps *bootstrap.AppDependencies) *Registry {
 		cityRoutes:     city.SetupCityModule(deps.DB),
 		itemRoutes:     item.SetupItemModule(deps.DB, deps.Validator),
 		searchRoutes:   search.SetupSearchModule(deps.DB, deps.SearchClient, deps.Validator),
+		cartRoutes:     cartModule,
+		//orderRoutes:    order.SetupOrderModule(deps.DB, deps.Validator, cartModule.GetService()),
 	}
 }
 
@@ -48,6 +54,9 @@ func (r *Registry) RegisterAllRoutes(router *gin.Engine) {
 	r.cityRoutes.RegisterRoutes(v1)
 	r.itemRoutes.RegisterRoutes(v1)
 	r.searchRoutes.RegisterRoutes(v1)
+    r.cartRoutes.RegisterRoutes(v1)
+	//r.orderRoutes.RegisterRoutes(v1)
+
 
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "healthy"})

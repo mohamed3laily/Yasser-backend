@@ -2,9 +2,11 @@ package migration
 
 import (
 	"log"
+	"yasser-backend/internal/cart"
 	"yasser-backend/internal/city"
 	"yasser-backend/internal/item-group/item"
 	itemcategory "yasser-backend/internal/item-group/item-category"
+	"yasser-backend/internal/order"
 	"yasser-backend/internal/user"
 	"yasser-backend/internal/vendor-group/category"
 	"yasser-backend/internal/vendor-group/vendor"
@@ -27,6 +29,10 @@ func Migrate(db *gorm.DB) {
 		&item.ItemSize{},
 		&item.ItemVariant{},
 		&itemcategory.ItemsCategory{},
+		&cart.CartItem{},
+	    &order.Order{},
+		&order.OrderItem{},
+		&order.OrderItemAddon{},
 	)
 	if err != nil {
 		log.Fatalf("❌ Database migration failed: %v", err)

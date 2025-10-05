@@ -1,0 +1,14 @@
+{
+  "invalid_vendor_id": "Invalid vendor ID provided",
+  "validation_failed": "Cart validation failed",
+  "price_changed": "Item price has changed",
+  "validation_success": "Cart validation completed successfully",
+  "item_not_found": "Item not found or inactive",
+  "item_vendor_mismatch": "Item doesn't belong to specified vendor",
+  "insufficient_stock": "Insufficient stock. Available: {{.available}}, Requested: {{.requested}}",
+  "invalid_size": "Invalid size selection",
+  "invalid_variant": "Invalid variant selection",
+  "invalid_addon": "Invalid addon selection: {{.addonId}}",
+  "empty_cart": "Cart cannot be empty",
+  "invalid_items": "Some items in cart are invalid"
+}
