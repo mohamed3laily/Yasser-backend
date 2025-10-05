@@ -2,7 +2,6 @@ package cart
 
 import (
 	"context"
-	"fmt"
 	"math"
 	"yasser-backend/internal/item-group/item"
 	"yasser-backend/pkg/errors"
@@ -84,9 +83,11 @@ func (s *service) validateAndProcessItem(cartItem CartItem, itemEntity *item.Ite
 	s.checkStock(cartItem, itemEntity, &validation, response)
 	s.checkPrice(cartItem, itemEntity, &validation, response)
 
+	// Always add to total with server-calculated price
+	s.addToTotal(cartItem, itemEntity, response)
+
 	if validation.IsValid {
 		validation.ItemDetails = s.createItemDetails(itemEntity)
-		s.addToTotal(cartItem, itemEntity, response)
 	} else {
 		response.IsValid = false
 	}
@@ -98,7 +99,6 @@ func (s *service) buildItemValidation(cartItem CartItem, itemEntity *item.Item) 
 	validation := CartItemValidation{
 		ItemID:  cartItem.ItemID,
 		IsValid: true,
-		Errors:  []string{},
 	}
 
 	s.validateSize(cartItem, itemEntity, &validation)
@@ -111,14 +111,12 @@ func (s *service) buildItemValidation(cartItem CartItem, itemEntity *item.Item) 
 func (s *service) validateSize(cartItem CartItem, itemEntity *item.Item, validation *CartItemValidation) {
 	if cartItem.SizeID != nil && !s.sizeExists(*cartItem.SizeID, itemEntity.Sizes) {
 		validation.IsValid = false
-		validation.Errors = append(validation.Errors, "cart.invalid_size")
 	}
 }
 
 func (s *service) validateVariant(cartItem CartItem, itemEntity *item.Item, validation *CartItemValidation) {
 	if cartItem.VariantID != nil && !s.variantExists(*cartItem.VariantID, itemEntity.Variants) {
 		validation.IsValid = false
-		validation.Errors = append(validation.Errors, "cart.invalid_variant")
 	}
 }
 
@@ -126,7 +124,7 @@ func (s *service) validateAddons(cartItem CartItem, itemEntity *item.Item, valid
 	for _, addonID := range cartItem.AddonIDs {
 		if !s.addonExists(addonID, itemEntity.Addons) {
 			validation.IsValid = false
-			validation.Errors = append(validation.Errors, fmt.Sprintf("cart.invalid_addon_%d", addonID))
+			break
 		}
 	}
 }
@@ -135,7 +133,6 @@ func (s *service) checkStock(cartItem CartItem, itemEntity *item.Item, validatio
 	if itemEntity.Stock < cartItem.Quantity {
 		response.OutOfStockIDs = append(response.OutOfStockIDs, cartItem.ItemID)
 		validation.IsValid = false
-		validation.Errors = append(validation.Errors, "cart.insufficient_stock")
 	}
 }
 
@@ -145,7 +142,6 @@ func (s *service) checkPrice(cartItem CartItem, itemEntity *item.Item, validatio
 	if !s.pricesMatch(serverPrice, cartItem.FinalPrice) {
 		response.PriceChangedIDs = append(response.PriceChangedIDs, cartItem.ItemID)
 		validation.IsValid = false
-		validation.Errors = append(validation.Errors, "cart.price_changed")
 	}
 }
 
@@ -203,7 +199,6 @@ func (s *service) markItemAsInvalid(response *CartValidationResponse, itemID int
 	response.Items = append(response.Items, CartItemValidation{
 		ItemID:  itemID,
 		IsValid: false,
-		Errors:  []string{errorKey},
 	})
 }
 

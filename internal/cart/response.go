@@ -4,6 +4,6 @@ type CartValidationResponse struct {
 	TotalPrice float64              `json:"totalPrice"`
 	Items      []CartItemValidation `json:"items"`
 
-	OutOfStockIDs  []int64 `json:"outOfStockIds,omitempty"`
-	PriceChangedIDs []int64 `json:"priceChangedIds,omitempty"`
+	OutOfStockIDs  []int64 `json:"outOfStockIds"`
+	PriceChangedIDs []int64 `json:"priceChangedIds"`
 }
