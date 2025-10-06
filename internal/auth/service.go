@@ -17,14 +17,14 @@ import (
 type Service struct {
 	authRepo Repository
 	userRepo user.Repository
-	waSender *WhatsAppSender
+	//waSender *WhatsAppSender
 }
 
 func NewService(authRepo Repository, userRepo user.Repository, waSender *WhatsAppSender, jwtSecret string) *Service {
 	return &Service{
 		authRepo: authRepo,
 		userRepo: userRepo,
-		waSender: waSender,
+		//waSender: waSender,
 	}
 }
 
@@ -57,7 +57,8 @@ func (s *Service) Login(phoneNumber string) error {
 		return err
 	}
 
-	return s.sendOtpViaWhatsapp(phoneNumber, otp)
+	//return s.waSender.SendOTP(phoneNumber, otp)
+	return nil
 }
 
 func (s *Service) VerifyOtp(phoneNumber, otp string) (*user.User, string, error) {
@@ -108,6 +109,6 @@ func (s *Service) generateOTP() (string, error) {
 	return fmt.Sprintf("%06d", n.Int64()+100000), nil
 }
 
-func (s *Service) sendOtpViaWhatsapp(phone, otp string) error {
-	return s.waSender.SendOTP(phone, otp)
-}
+// func (s *Service) sendOtpViaWhatsapp(phone, otp string) error {
+// 	return s.waSender.SendOTP(phone, otp)
+// }

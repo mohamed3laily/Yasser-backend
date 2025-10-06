@@ -21,7 +21,7 @@ type repo struct{
 }
 
 func NewRepository(db *gorm.DB) Repository {
-	return &repo{}
+	return &repo{db: db}
 }
 
 func (r *repo) FindByPhone(phone string) (*User, error) {

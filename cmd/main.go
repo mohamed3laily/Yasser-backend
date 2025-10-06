@@ -23,7 +23,7 @@ func main() {
 	route.Use(i18n.LanguageMiddleware())
 
 	registry := routes.NewRegistry(deps)
-	registry.RegisterAllRoutes(route)
+	registry.RegisterAllRoutes(route, deps)
 
 	log.Printf("🚀 Starting server on port %s", deps.Config.Port)
 	if err := route.Run(":" + deps.Config.Port); err != nil {
